@@ -1,0 +1,16 @@
+{
+    "psql" : {
+        "db_name" : "indexer",
+        "db_user" : "olafy",
+        "db_password" : "1678214371",
+        "db_host" :"localhost",
+        "db_port" : "5432"
+    },
+    "path" : {
+        "output_path" : "~/bin/txs_type_report_1",
+        "block_file_path" : "~/bin/test_block/",
+        "script_path" : "~/bin/loading",
+        "types_script_path" : "~/bin/loading/types_script/",
+        "txt_file_path" : "/home/usr/bin"
+    }
+}
