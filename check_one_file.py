@@ -33,7 +33,7 @@ from functions import decode_tx
 
 
 
-tx_output_path = os.getenv('txt')
+tx_output_path = os.getenv('txt_file_path')
 file_path = os.getenv('FILE_PATH')
 file_name = os.getenv('FILE_NAME')
 
