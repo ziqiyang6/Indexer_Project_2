@@ -55,7 +55,7 @@ while getopts ":h" opt; do
 done
 
 # info.json path
-export info_path=~/bin/loading/info.json # Change this to correct path of info.json!!
+export info_path=info.json # Change this to correct path of info.json!!
 
 # Set the path of directory and cd to it
 folder_path=$(eval echo $(jq -r '.path.block_file_path' $info_path))
@@ -100,7 +100,7 @@ DBHOST=$(jq -r '.psql.db_host' $info_path)
 DBPORT=$(jq -r '.psql.db_port' $info_path)
 
 # Connect to psql
-PGPASSWORD=$DBPASSWORD psql -d indexer -U olafy -h localhost -f Txs.sql
+PGPASSWORD=$DBPASSWORD psql -d $DBNAME -U $DBUSER -h localhost -f Txs.sql
 
 
 # Select the files in the folder path and run python script 4
