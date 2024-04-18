@@ -90,7 +90,7 @@ export ERR=$txt/error.log
 
 cd $(eval echo $(jq -r '.path.script_path' $info_path))
 
-
+txt_file_path=$(eval echo $(jq -r '.path.txt_file_path' $info_path))
 
 # Set the values of psql login info
 DBNAME=$(jq -r '.psql.db_name' $info_path)
