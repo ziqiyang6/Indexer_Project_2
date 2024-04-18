@@ -11,6 +11,6 @@
         "block_file_path" : "~/bin/Indexer-Project/test_blocks/",
         "script_path" : "~/bin/Indexer-Project",
         "types_script_path" : "~/bin/Indexer-Project/types_script/",
-        "txt_file_path" : "/home/zyang/bin"
+        "txt_file_path" : "/home/zyang/bin/types_2.txt"
     }
 }
