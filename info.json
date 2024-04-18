@@ -8,9 +8,9 @@
     },
     "path" : {
         "output_path" : "~/bin/txs_type_report_1",
-        "block_file_path" : "~/bin/test_block/",
+        "block_file_path" : "~/bin/test_blocks/",
         "script_path" : "~/bin/loading",
-        "types_script_path" : "~/bin/loading/types_script/",
+        "types_script_path" : "~/bin/Indexer-Project/types_script/",
         "txt_file_path" : "/home/usr/bin"
     }
 }
