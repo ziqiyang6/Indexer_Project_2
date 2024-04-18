@@ -90,7 +90,7 @@ export ERR=$txt/error.log
 
 cd $(eval echo $(jq -r '.path.script_path' $info_path))
 
-txt_file_path=$(eval echo $(jq -r '.path.txt_file_path' $info_path))
+
 
 # Set the values of psql login info
 DBNAME=$(jq -r '.psql.db_name' $info_path)
@@ -107,7 +107,7 @@ PGPASSWORD=$DBPASSWORD psql -d $DBNAME -U $DBUSER -h localhost -f Txs.sql
 for file_name in $files; do
     export FILE_PATH="${folder_path}${file_name}"
     export FILE_NAME="${file_name}"
-
+    export txt_file_path=$(eval echo $(jq -r '.path.txt_file_path' $info_path))
     python3 check_one_file.py >> $LOG 2>> $ERR 
     echo "The exit code of $FILE_NAME is $? (expected 0)"
     python3 loading_files.py
