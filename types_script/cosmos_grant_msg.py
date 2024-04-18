@@ -74,7 +74,7 @@ def main(tx_id, tx_type, message, ids):
             msg = message['grant']['authorization']['msg']
             max_tokens = ''
 
-            values = (tx_id, tx_type, ids['granter_id'], ids['grantee_id'], authorizationtype, expiration, max_tokens, authorization_type, msg )
+            values = (tx_id, tx_type, ids['granter_id'], ids['grantee_id'], authorizationtype, expiration, max_tokens, authorization_type, msg, message_info  )
             cursor.execute(query, values)
 
         connection.commit()
