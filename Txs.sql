@@ -27,7 +27,7 @@ create table transactions
     fee_denom      VARCHAR              not null,
     fee_amount     VARCHAR              not null,
     gas_limit  VARCHAR                  not null,
-    created_at timestamp                      not null,
+    created_at timestamp with time zone                      not null,
     tx_info    jsonb                          not null,
     FOREIGN KEY (block_id) REFERENCES blocks(block_id)
 );
@@ -43,8 +43,8 @@ create table address
     address_type    VARCHAR       not null,
     address         VARCHAR       not null,
     comment         VARCHAR       not null,
-    created_at      timestamp     not null,
-    updated_at      timestamp     not null
+    created_at      timestamp with time zone     not null,
+    updated_at      timestamp with time zone     not null
 );
 
 
