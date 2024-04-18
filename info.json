@@ -1,10 +1,10 @@
 {
     "psql" : {
-        "db_name" : "indexer",
-        "db_user" : "olafy",
-        "db_password" : "1678214371",
+        "db_name" : "zydb",
+        "db_user" : "zyang",
+        "db_password" : "Tabind99",
         "db_host" :"localhost",
-        "db_port" : "5432"
+        "db_port" : "5433"
     },
     "path" : {
         "output_path" : "~/bin/Indexer-Project/txs_type_report_1",
