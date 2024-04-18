@@ -55,7 +55,7 @@ while getopts ":h" opt; do
 done
 
 # info.json path
-export info_path=info.json # Change this to correct path of info.json!!
+export info_path=~/bin/Indexer-Project/info.json # Change this to correct path of info.json!!
 
 # Set the path of directory and cd to it
 folder_path=$(eval echo $(jq -r '.path.block_file_path' $info_path))
