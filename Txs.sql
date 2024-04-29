@@ -10,7 +10,8 @@ create table blocks
     chain_id        VARCHAR                   not null,
     height          VARCHAR                   not null,
     tx_num          VARCHAR                   not null,
-    created_at      timestamp with time zone                     not null
+    created_at      timestamp with time zone                     not null,
+    UNIQUE (chain_id, height)
 );
 
 
@@ -22,14 +23,17 @@ create table transactions
     tx_id         uuid default gen_random_uuid() not null
         primary key,
     block_id      uuid                       not null,
-    chain_id        VARCHAR                   not null,    
+    tx_hash         VARCHAR                   not null,
+    chain_id        VARCHAR                   not null,
+    height          VARCHAR             not null,    
     memo       VARCHAR                  not null,   
     fee_denom      VARCHAR              not null,
     fee_amount     VARCHAR              not null,
     gas_limit  VARCHAR                  not null,
-    created_at timestamp with time zone                      not null,
+    created_at timestamp with time zone                     not null,
     tx_info    jsonb                          not null,
-    FOREIGN KEY (block_id) REFERENCES blocks(block_id)
+    FOREIGN KEY (block_id) REFERENCES blocks(block_id),
+    UNIQUE (chain_id, height)
 );
 
 
@@ -41,7 +45,7 @@ create table address
     address_id         uuid default gen_random_uuid() not null
         primary key,   
     address_type    VARCHAR       not null,
-    address         VARCHAR       not null,
+    address         VARCHAR       not null       UNIQUE,
     comment         VARCHAR       not null,
     created_at      timestamp with time zone     not null,
     updated_at      timestamp with time zone     not null
@@ -53,8 +57,11 @@ create table address
 
 create table type
 (   
+   id           uuid default gen_random_uuid() not null
+        primary key,
    type         VARCHAR       not null,
-   height       VARCHAR       not null
+   height       VARCHAR       not null,
+   UNIQUE (type, height)
 );
 
 
@@ -65,7 +72,7 @@ create table alliance_claimdelegationrewards_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id                           uuid             not null,
+    tx_id                           uuid             not null     UNIQUE,
     delegator_address_id            uuid             not null,
     validator_address_id            uuid             not null,
     tx_type                         VARCHAR          not null,   
@@ -84,7 +91,7 @@ create table cosmos_withdrawvalidatorcommission_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id               uuid             not null,
+    tx_id                           uuid             not null     UNIQUE,
     validator_address_id          uuid             not null,
     tx_type                       VARCHAR          not null,
     message_info                    jsonb            not null,
@@ -101,7 +108,7 @@ create table alliance_delegate_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id               uuid                  not null,
+    tx_id                           uuid             not null     UNIQUE,
     delegator_address_id          uuid             not null,
     validator_address_id          uuid             not null, 
     tx_type             VARCHAR          not null,   
@@ -123,7 +130,7 @@ create table alliance_redelegate_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id               uuid                  not null,
+    tx_id                           uuid             not null     UNIQUE,
     delegator_address_id              uuid             not null,
     validator_src_address_id          uuid             not null,
     validator_dst_address_id          uuid             not null,    
@@ -147,7 +154,7 @@ create table alliance_undelegate_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id               uuid                  not null,
+    tx_id                           uuid             not null     UNIQUE,
     delegator_address_id          uuid             not null,
     validator_address_id          uuid             not null, 
     tx_type             VARCHAR          not null,   
@@ -169,7 +176,7 @@ create table cosmos_exec_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id               uuid                  not null,
+    tx_id                           uuid             not null     UNIQUE,
     receive_address_id          uuid             not null,
     tx_type             VARCHAR          not null,    
     msg_num             VARCHAR          not null,
@@ -188,7 +195,7 @@ create table cosmos_grant_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id               uuid                  not null,
+    tx_id                           uuid             not null     UNIQUE,
     send_address_id          uuid             not null,
     receive_address_id          uuid             not null,
     tx_type             VARCHAR          not null,
@@ -208,7 +215,7 @@ create table cosmos_grant_allowlist
 (
     address_id      uuid default gen_random_uuid() not null
         primary key,
-    message_id      uuid                    not null,
+    message_id      uuid                    not null    UNIQUE,
     addresses       VARCHAR                 not null,
     FOREIGN KEY (message_id) REFERENCES cosmos_grant_msg(message_id)
     
@@ -222,7 +229,7 @@ create table cosmos_revoke_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id               uuid                  not null,
+    tx_id                           uuid             not null     UNIQUE,
     send_address_id     uuid             not null,
     receive_address_id  uuid             not null,
     tx_type             VARCHAR          not null,
@@ -241,7 +248,7 @@ create table cosmos_send_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id               uuid                  not null,
+    tx_id                           uuid             not null     UNIQUE,
     from_address_id          uuid             not null,
     to_address_id          uuid             not null,    
     tx_type             VARCHAR          not null,
@@ -263,7 +270,7 @@ create table cosmos_withdrawdelegatorreward_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id               uuid                  not null,
+    tx_id                           uuid             not null     UNIQUE,
     delegator_address_id          uuid             not null,
     validator_address_id          uuid             not null,    
     tx_type             VARCHAR          not null,
@@ -283,7 +290,7 @@ create table cosmos_beginredelegate_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id               uuid                  not null,
+    tx_id                           uuid             not null     UNIQUE,
     delegator_address_id              uuid             not null,
     validator_src_address_id          uuid             not null,
     validator_dst_address_id          uuid             not null,    
@@ -307,7 +314,7 @@ create table cosmos_delegate_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id               uuid                  not null,
+    tx_id                           uuid             not null     UNIQUE,
     delegator_address_id          uuid             not null,
     validator_address_id          uuid             not null, 
     tx_type             VARCHAR          not null,   
@@ -328,7 +335,7 @@ create table cosmos_undelegate_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id               uuid                  not null,
+    tx_id                           uuid             not null     UNIQUE,
     delegator_address_id          uuid             not null,
     validator_address_id          uuid             not null, 
     tx_type             VARCHAR          not null,   
@@ -349,7 +356,7 @@ create table cosmwasm_executecontract_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id               uuid                  not null,
+    tx_id                           uuid             not null     UNIQUE,
     send_address_id          uuid             not null,    
     tx_type             VARCHAR          not null,
     contracts           VARCHAR         not null,
@@ -369,7 +376,7 @@ create table cosmwasm_instantiatecontract_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id               uuid                  not null,
+    tx_id                           uuid             not null     UNIQUE,
     send_address_id          uuid             not null,
     admin_address_id    uuid             not null, 
     tx_type             VARCHAR          not null,
@@ -392,7 +399,7 @@ create table cosmwasm_storecode_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id                   uuid               not null,
+    tx_id                           uuid             not null     UNIQUE,
     sender_address_id          uuid             not null,    
     tx_type             VARCHAR          not null,
     wasm_byte_code          VARCHAR          not null,
@@ -410,7 +417,7 @@ create table ibc_transfer_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id                                   uuid             not null,
+    tx_id                           uuid             not null     UNIQUE,
     sender_address_id                       uuid             not null,
     receiver_address_id                     uuid             not null,    
     tx_type                                 VARCHAR          not null,
@@ -436,7 +443,7 @@ create table ibc_updateclient_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id                           uuid               not null,    
+    tx_id                           uuid             not null     UNIQUE,    
     tx_type                         VARCHAR          not null,
     client_id                       VARCHAR          not null,
     client_message                  jsonb              not null,
@@ -452,7 +459,7 @@ create table ibc_timeout_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id                           uuid               not null,    
+    tx_id                           uuid             not null     UNIQUE,    
     tx_type                         VARCHAR          not null,
     sequence_num                    VARCHAR          not null,
     source_port                     VARCHAR          not null,
@@ -480,7 +487,7 @@ create table ibc_recvpacket_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id                           uuid               not null,    
+    tx_id                           uuid             not null     UNIQUE,    
     tx_type                         VARCHAR          not null,
     sequence_num                    VARCHAR          not null,
     source_port                     VARCHAR          not null,
@@ -507,7 +514,7 @@ create table ibc_acknowledgement_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id                           uuid               not null,    
+    tx_id                           uuid             not null     UNIQUE,    
     tx_type                         VARCHAR          not null,
     sequence_num                    VARCHAR          not null,
     source_port                     VARCHAR          not null,
@@ -534,7 +541,7 @@ create table ibc_channelopenconfirm_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id                           uuid               not null,    
+    tx_id                           uuid             not null     UNIQUE,    
     tx_type                         VARCHAR          not null,
     port_id                         VARCHAR          not null,
     channel_id                      VARCHAR          not null,
@@ -554,7 +561,7 @@ create table ibc_channelopentry_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id                           uuid               not null,    
+    tx_id                           uuid             not null     UNIQUE,    
     tx_type                         VARCHAR          not null,
     port_id                         VARCHAR          not null,
     previous_channel_id             VARCHAR          not null,
@@ -581,7 +588,7 @@ create table cosmos_editvalidator_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id                           uuid               not null,
+    tx_id                           uuid             not null     UNIQUE,
     validator_address_id            uuid             not null,    
     tx_type                         VARCHAR          not null,
     description_moniker             VARCHAR          not null,
