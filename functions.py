@@ -5,16 +5,21 @@ Project Name: functions.py                                                      
                                                                                     *
 Programming Language: Python 3.11                                                   *
                                                                                     *
-Libraries: json  os    sys     requests  2.31.0      jsonschema   4.19.2            *
-            time               psycopg2   2.9.9                                     *
+Libraries: json  os    sys     requests  2.31.0      jsonschema   4.21.1           *
+            time               psycopg2   2.9.9       hashlib         base64        *
+            binascii                                                                *
 Creater Name: Ziqi Yang                                                             *
                                                                                     *
 Published Date: 4/15/2024                                                           *
                                                                                     *
 Version: 1.0                                                                        *
                                                                                     *
-                                                                                    *
-                                                                                    *
+Version: 1.1                                                                        *
+Function 'hash_to_hex' has been added to convert transaction string to hex hash     *
+Function 'block_hash_base64_to_hex' has been added to convert base 64 block hash    *
+to hex hash                                                                         *
+hashlib, base64, and binascii, these three packages have been added                 *
+All of them are included in original Python                                         *
                                                                                     *
                                                                                     *
 **********************************************************************************'''
@@ -29,6 +34,9 @@ import requests
 import time
 import psycopg2
 from psycopg2 import OperationalError
+import hashlib
+import base64
+import binascii
 
 
 def check_file(file_path,file_name):
@@ -719,4 +727,26 @@ def create_connection(db_name, db_user, db_password, db_host, db_port):
         print(f"The error '{e}' occurred")
     return connection
 
+def hash_to_hex(data: str) -> str:
+    try:
+        # Convert data from base64 to bytes
+        data_bytes = base64.b64decode(data)
+        # Calculate SHA-256 hash
+        sha256_hash = hashlib.sha256(data_bytes).hexdigest()
+        # Convert hash to uppercase
+        return sha256_hash.upper()
+    except Exception as e:
+        print(f"Error while hashing: {e}")
+        return None
 
+def block_hash_base64_to_hex(hash: str) -> str:
+    try:
+        # Convert data from base64 to bytes
+        data_bytes = base64.b64decode(hash)
+        # Convert SHA-256 hash
+        hex_str = binascii.hexlify(data_bytes).decode('utf-8')
+        # Convert hash to uppercase
+        return hex_str.upper()
+    except Exception as e:
+        print(f"Error while hashing: {e}")
+        return None
