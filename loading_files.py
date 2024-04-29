@@ -13,8 +13,8 @@ Published Date: 4/15/2024                                                       
                                                                                     *
 Version: 1.0                                                                        *
                                                                                     *
-                                                                                    *
-                                                                                    *
+Version: 1.1                                                                        *
+Now the block hash is hex version                                                   *
                                                                                     *
                                                                                     *
 **********************************************************************************'''
@@ -24,6 +24,7 @@ import os
 import json
 from functions import check_file
 from functions import create_connection
+from functions import block_hash_base64_to_hex
 
 with open('info.json', 'r') as f:
     info = json.load(f)
@@ -42,6 +43,7 @@ file_name = os.getenv('FILE_NAME')
 
 content = check_file(file_path, file_name)
 block_hash = content['block_id']['hash']
+block_hash_hex = block_hash_base64_to_hex(block_hash)
 chain_id = content['block']['header']['chain_id']
 height = content['block']['header']['height']
 tx_num = len(content['block']['data']['txs'])
@@ -53,7 +55,7 @@ query = """
 INSERT INTO blocks (block_hash, chain_id, height, tx_num, created_at) VALUES (%s, %s, %s, %s, %s);
 """
 
-values = (block_hash, chain_id, height, tx_num, created_time)
+values = (block_hash_hex, chain_id, height, tx_num, created_time)
 
 cursor = connection.cursor()
 cursor.execute(query, values)
