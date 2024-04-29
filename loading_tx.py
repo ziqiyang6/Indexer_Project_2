@@ -5,7 +5,7 @@ Project Name: loading_tx.py                                                     
                                                                                     *
 Programming Language: Python 3.11                                                   *
                                                                                     *
-Libraries: json    importlib 7.0.1      os                                          *
+Libraries: json    importlib       os                                               *
                                                                                     *
 Creater Name: Ziqi Yang                                                             *
                                                                                     *
@@ -13,8 +13,9 @@ Published Date: 4/15/2024                                                       
                                                                                     *
 Version: 1.0                                                                        *
                                                                                     *
-                                                                                    *
-                                                                                    *
+Version: 1.1
+Height now will also be loaded to transaction table, in which 'height' is a column  *
+Transaction hash now is included in transaction table as well                       *
                                                                                     *
                                                                                     *
 **********************************************************************************'''
@@ -23,12 +24,14 @@ Version: 1.0                                                                    
 from functions import check_file
 from functions import create_connection
 from functions import decode_tx
+from functions import hash_to_hex
 import json
 import importlib
 import address_load
 import os
 from pathlib import Path
 import sys
+
 
 # import the login info for psql from 'info.json'
 with open('info.json', 'r') as f:
@@ -51,14 +54,15 @@ file_name = os.getenv('FILE_NAME')
 content = check_file(file_path, file_name)
 num = os.getenv('x')
 # decoded_response = decode_tx(content['block']['data']['txs'][int(num)])
-decoded_response = decode_tx(content['block']['data']['txs'][0])
-block_hash = content['block_id']['hash']
-search_query = f"SELECT block_id, height, chain_id FROM blocks WHERE block_hash = '{block_hash}'" # Search the block hash from the block
+transaction_string = content['block']['data']['txs'][0]
+decoded_response = decode_tx(transaction_string)
+tx_hash = hash_to_hex(transaction_string)
+chain_id = content['block']['header']['chain_id']
+height = content['block']['header']['height']
+search_query = f"SELECT block_id FROM blocks WHERE height = '{height}'" # Search the block hash from the block
 cursor.execute(search_query)
 result = cursor.fetchall()
 block_id = result[0][0]
-height = result[0][1]
-chain_id = result[0][2]
 memo = decoded_response['tx']['body']['memo']
 fee_denom = decoded_response['tx']['auth_info']['fee']['amount'][0]['denom']
 fee_amount = decoded_response['tx']['auth_info']['fee']['amount'][0]['amount']
@@ -68,9 +72,9 @@ tx_info = json.dumps(decoded_response)
 
 # Edit the query that will be loaded to the database
 query = """
-INSERT INTO transactions (block_id, chain_id, memo, fee_denom, fee_amount, gas_limit, created_at, tx_info) VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING tx_id;
+INSERT INTO transactions (block_id, tx_hash, chain_id, height, memo, fee_denom, fee_amount, gas_limit, created_at, tx_info) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING tx_id;
 """
-values = (block_id, chain_id, memo, fee_denom, fee_amount, gas_limit, created_time, tx_info)
+values = (block_id, tx_hash, chain_id, height, memo, fee_denom, fee_amount, gas_limit, created_time, tx_info)
 
 cursor.execute(query, values)
 connection.commit()
