@@ -23,7 +23,7 @@ All of them are included in original Python                                     
                                                                                     *  
 Version: 1.2                                                                        *
 Function 'decode_tx' has been updated. The old url had been changed to new url      *
-'https://lcd-terra.tfl.foundation/cosmos/tx/v1beta1/decode'                         *
+'https://terra-rest.publicnode.com/cosmos/tx/v1beta1/decode'                         *
 **********************************************************************************'''
 
 #    Functions start below
@@ -689,7 +689,7 @@ def decode_tx(tx, max_retries=3, retry_delay=2):
     Returns:
         Decoded transaction if successful, None otherwise.
     """
-    url = "https://lcd-terra.tfl.foundation/cosmos/tx/v1beta1/decode"
+    url = "https://terra-rest.publicnode.com/cosmos/tx/v1beta1/decode"
     headers = {'Content-Type': 'application/json'}
     data = json.dumps({"tx_bytes": tx})
     retries = 0
