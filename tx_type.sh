@@ -110,7 +110,7 @@ for file_name in $files; do
     export txt_file_path=$(eval echo $(jq -r '.path.txt_file_path' $info_path))
     python3 check_one_file.py >> $LOG 2>> $ERR 
     echo "The exit code of $FILE_NAME is $? (expected 0)"
-    python3 loading_files.py
+    python3 loading_files.py >> $LOG 2>> $ERR 
 
     # Define the length of transaction
     length=$(jq '.block.data.txs | length' "$FILE_PATH")
@@ -121,7 +121,7 @@ for file_name in $files; do
         # For every i less than the length of transaction, make it as the ith transaction in the block
         for ((i = 0; i < $length; i++)); do
            export x=$i
-           python3 loading_tx.py
+           python3 loading_tx.py >> $LOG 2>> $ERR 
         done
 
     else
