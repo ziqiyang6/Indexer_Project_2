@@ -379,7 +379,7 @@ create index cosmos_withdrawdelegatorreward_delegator_address_id
     on cosmos_withdrawdelegatorreward_msg (delegator_address_id);
 
 create index cosmos_withdrawdelegatorreward_validator_address_id
-    on cosmos_withdrawdelegatorreward_msgs (validator_address_id);
+    on cosmos_withdrawdelegatorreward_msg (validator_address_id);
 
 
 
