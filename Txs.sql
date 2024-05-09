@@ -1,3 +1,16 @@
+---------------------------------------------------------------------------
+---  Project Name: Txs.sql                                                -
+---                                                                       -
+---  Language: sql                                                        -
+---                                                                       -
+---                                                                       -
+---                                                                       -
+---                                                                       -
+---                                                                       -
+---                                                                       -
+---                                                                       -   
+-------------------------------------------------------------------------
+
 create extension if not exists "pgcrypto";
 
 -- Block table 
@@ -13,6 +26,16 @@ create table blocks
     created_at      timestamp with time zone                     not null,
     UNIQUE (chain_id, height)
 );
+
+
+create index blocks_chain_id
+    on blocks (chain_id);
+
+create index blocks_block_hash
+    on blocks (block_hash);
+
+create index blocks_chain_id_hash
+    on blocks (chain_id, block_hash);
 
 
 
@@ -37,6 +60,16 @@ create table transactions
 );
 
 
+create index transactions_tx_hash
+    on transactions (tx_hash);
+
+create index transactions_chain_id
+    on transactions (chain_id);
+
+create index transactions_chain_id_hash
+    on transactions (chain_id, tx_hash);
+
+
 
 -- address table for all types of addresses
 
@@ -50,6 +83,16 @@ create table address
     created_at      timestamp with time zone     not null,
     updated_at      timestamp with time zone     not null
 );
+
+
+create index address_address
+    on address (address);
+
+create index address_address_type
+    on address (address_type);
+
+create index address_address_address_type
+    on address (address, address_type);
 
 
 
@@ -84,6 +127,13 @@ create table alliance_claimdelegationrewards_msg
 );
 
 
+create index alli_delegationrewards_delegator_address_id
+    on alliance_claimdelegationrewards_msg (delegator_address_id);
+
+create index alli_delegationrewards_validator_address_id
+    on alliance_claimdelegationrewards_msg (validator_address_id);
+
+
 
 -- cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission
 
@@ -99,6 +149,9 @@ create table cosmos_withdrawvalidatorcommission_msg
     FOREIGN KEY (validator_address_id) REFERENCES address(address_id)
 );
 
+
+create index cosmos_withdrawvalidatorcommission_validator_address_id
+    on cosmos_withdrawvalidatorcommission_msg (validator_address_id);
 
 
 
@@ -121,6 +174,11 @@ create table alliance_delegate_msg
 );
 
 
+create index alli_delegate_delegator_address_id
+    on alliance_delegate_msg (delegator_address_id);
+
+create index alli_delegate_validator_address_id
+    on alliance_delegate_msg (validator_address_id);
 
 
 
@@ -145,6 +203,14 @@ create table alliance_redelegate_msg
 );
 
 
+create index alli_redelegate_delegator_address_id
+    on alliance_redelegate_msg (delegator_address_id);
+
+create index alli_redelegate_validator_src_address_id
+    on alliance_redelegate_msg (validator_src_address_id);
+
+create index alli_redelegate_validator_dst_address_id
+    on alliance_redelegate_msg (validator_dst_address_id);
 
 
 
@@ -167,6 +233,11 @@ create table alliance_undelegate_msg
 );
 
 
+create index alli_undelegate_delegator_address_id
+    on alliance_undelegate_msg (delegator_address_id);
+
+create index alli_undelegate_validator_address_id
+    on alliance_undelegate_msg (validator_address_id);
 
 
 
@@ -186,6 +257,9 @@ create table cosmos_exec_msg
 
 );
 
+
+create index cosmos_exec_receive_address_id
+    on cosmos_exec_msg (receive_address_id);
 
 
 
@@ -208,8 +282,15 @@ create table cosmos_grant_msg
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
     FOREIGN KEY (send_address_id) REFERENCES address(address_id),
     FOREIGN KEY (receive_address_id) REFERENCES address(address_id)
-
 );
+
+
+create index cosmos_grant_receive_address_id
+    on cosmos_grant_msg (receive_address_id);
+
+create index cosmos_grant_send_address_id
+    on cosmos_grant_msg (send_address_id);
+
 
 create table cosmos_grant_allowlist
 (
@@ -221,6 +302,8 @@ create table cosmos_grant_allowlist
     
 );
 
+create index cosmos_grant_allowlist_addresses
+    on cosmos_grant_allowlist (addresses);
 
 
 -- cosmos_authz_v1beta1_MsgRevoke table 
@@ -240,6 +323,12 @@ create table cosmos_revoke_msg
     FOREIGN KEY (receive_address_id) REFERENCES address(address_id)
 );
 
+
+create index cosmos_revoke_send_address_id
+    on cosmos_revoke_msg (send_address_id);
+
+create index cosmos_revoke_receive_address_id
+    on cosmos_revoke_msg (receive_address_id);
 
 
 -- cosmos_bank_v1beta1_MsgSend table
@@ -261,6 +350,11 @@ create table cosmos_send_msg
 );
 
 
+create index cosmos_send_from_address_id
+    on cosmos_send_msg (from_address_id);
+
+create index cosmos_revoke_to_address_id
+    on cosmos_send_msg (to_address_id);
 
 
 
@@ -281,6 +375,11 @@ create table cosmos_withdrawdelegatorreward_msg
 );
 
 
+create index cosmos_withdrawdelegatorreward_delegator_address_id
+    on cosmos_withdrawdelegatorreward_msg (delegator_address_id);
+
+create index cosmos_withdrawdelegatorreward_validator_address_id
+    on cosmos_withdrawdelegatorreward_msgs (validator_address_id);
 
 
 
@@ -305,6 +404,14 @@ create table cosmos_beginredelegate_msg
 );
 
 
+create index cosmos_beginredelegate_delegator_address_id
+    on cosmos_beginredelegate_msg (delegator_address_id);
+
+create index cosmos_beginredelegate_validator_src_address_id
+    on cosmos_beginredelegate_msg (validator_src_address_id);
+
+create index cosmos_beginredelegate_validator_dst_address_id
+    on cosmos_beginredelegate_msg (validator_dst_address_id);
 
 
 
@@ -327,6 +434,12 @@ create table cosmos_delegate_msg
 );
 
 
+create index cosmos_delegate_delegator_address_id
+    on cosmos_delegate_msg (delegator_address_id);
+
+create index cosmos_delegate_validator_address_id
+    on cosmos_delegate_msg (validator_address_id);
+
 
 
 -- cosmos_staking_v1beta1_MsgUndelegate table
@@ -348,6 +461,12 @@ create table cosmos_undelegate_msg
 );
 
 
+create index cosmos_undelegate_delegator_address_id
+    on cosmos_undelegate_msg (delegator_address_id);
+
+create index cosmos_undelegate_validator_address_id
+    on cosmos_undelegate_msg (validator_address_id);
+
 
 
 -- cosmwasm_wasm_v1_MsgExecuteContract table   contracts to another table 
@@ -367,6 +486,10 @@ create table cosmwasm_executecontract_msg
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
     FOREIGN KEY (send_address_id) REFERENCES address(address_id)
 );
+
+
+create index cosmwasm_executecontract_send_address_id
+    on cosmwasm_executecontract_msg (send_address_id);
 
 
 
@@ -392,6 +515,13 @@ create table cosmwasm_instantiatecontract_msg
 );
 
 
+create index cosmwasm_instantiatecontract_send_address_id
+    on cosmwasm_instantiatecontract_msg (send_address_id);
+
+create index cosmwasm_instantiatecontract_admin_address_id
+    on cosmwasm_instantiatecontract_msg (admin_address_id);
+
+
 
 -- cosmwasm_wasm_v1_MsgStoreCode table
 
@@ -408,6 +538,10 @@ create table cosmwasm_storecode_msg
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
     FOREIGN KEY (sender_address_id) REFERENCES address(address_id)
 );
+
+
+create index cosmwasm_storecode_sender_address_id
+    on cosmwasm_storecode_msg (sender_address_id);
 
 
 
@@ -436,6 +570,13 @@ create table ibc_transfer_msg
 );
 
 
+create index ibc_transfer_sender_address_id
+    on ibc_transfer_msg (sender_address_id);
+
+create index ibc_transfer_receiver_address_id
+    on ibc_transfer_msg (receiver_address_id);
+
+
 
 -- ibc_core_client_v1_MsgUpdateClient table
 
@@ -451,6 +592,11 @@ create table ibc_updateclient_msg
     message_info                    jsonb            not null,
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id)
 );
+
+
+create index ibc_updateclient_client_id
+    on ibc_updateclient_msg (client_id);
+
 
 
 -- ibc.core.channel.v1.MsgTimeout table 
@@ -604,3 +750,5 @@ create table cosmos_editvalidator_msg
 );
 
 
+create index cosmos_editvalidator_validator_address_id
+    on cosmos_editvalidator_msg (validator_address_id);
