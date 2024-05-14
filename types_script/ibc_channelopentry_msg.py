@@ -13,7 +13,8 @@ Published Date: 4/15/2024                                                       
                                                                                     *
 Version: 1.0                                                                        *
                                                                                     *
-                                                                                    *
+Version: 1.1                                                                        *
+'version' column in query has been changed to 'version_num'.                              *                                                                                    *
                                                                                     *
                                                                                     *
                                                                                     *
@@ -41,7 +42,7 @@ def main(tx_id, tx_type, message):
     try:
         # Edit the query that will be loaded to the database
         query = """
-                INSERT INTO ibc_channelopentry_msg (tx_id, tx_type, port_id, previous_channel_id, channel_state, channel_ordering, counterparty_port_id, counterparty_channel_id, connection_hops, version, counterparty_version, proof_init, proof_height_revision_number, proof_height_revision_height, signer, message_info) 
+                INSERT INTO ibc_channelopentry_msg (tx_id, tx_type, port_id, previous_channel_id, channel_state, channel_ordering, counterparty_port_id, counterparty_channel_id, connection_hops, version_num, counterparty_version, proof_init, proof_height_revision_number, proof_height_revision_height, signer, message_info) 
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
                 """
 
