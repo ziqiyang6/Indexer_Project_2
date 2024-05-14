@@ -13,7 +13,8 @@ Published Date: 4/15/2024                                                       
                                                                                     *
 Version: 1.0                                                                        *
                                                                                     *
-                                                                                    *
+Version: 1.1                                                                        *
+'data' column in query has been changed to 'data_msg'.                              *                                                                                    *
                                                                                     *
                                                                                     *
                                                                                     *
@@ -40,7 +41,7 @@ def main(tx_id, tx_type, message):
 
     try:
         query = """
-                INSERT INTO ibc_timeout_msg (tx_id, tx_type, sequence_num, source_port, source_channel, destination_port, destination_channel, data, timeout_height_revision_number, timeout_height_revision_height, timeout_timestamp, proof_unreceived, proof_height_revision_number, proof_height_revision_height, next_seq_recv, signer, message_info) 
+                INSERT INTO ibc_timeout_msg (tx_id, tx_type, sequence_num, source_port, source_channel, destination_port, destination_channel, data_msg, timeout_height_revision_number, timeout_height_revision_height, timeout_timestamp, proof_unreceived, proof_height_revision_number, proof_height_revision_height, next_seq_recv, signer, message_info) 
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
                 """
         sequence =  message['packet']['sequence']
