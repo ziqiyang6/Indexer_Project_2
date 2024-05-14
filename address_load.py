@@ -21,7 +21,7 @@ def main(key, address):
     updated_time = created_time
 
     query = """
-    INSERT INTO address (address_type, address, comment, created_at, updated_at) VALUES (%s, %s, %s, %s, %s)
+    INSERT INTO address (address_type, addresses, comment, created_at, updated_at) VALUES (%s, %s, %s, %s, %s)
     RETURNING address_id;
     
     """
