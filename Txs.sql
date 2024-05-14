@@ -4,9 +4,11 @@
 ---  Language: sql                                                        -
 ---                                                                       -
 ---                                                                       -
+--- Version: 1.0                                                          -
 ---                                                                       -
 ---                                                                       -
----                                                                       -
+--- Version: 1.1                                                          -
+--- New indexes have been added, such as indexes for all tx_id in msg     -                                                                       
 ---                                                                       -
 ---                                                                       -   
 -------------------------------------------------------------------------
@@ -28,14 +30,15 @@ create table blocks
 );
 
 
-create index blocks_chain_id
-    on blocks (chain_id);
 
 create index blocks_block_hash
     on blocks (block_hash);
 
-create index blocks_chain_id_hash
-    on blocks (chain_id, block_hash);
+create index blocks_chain_id_height
+    on blocks (chain_id,height);
+
+create unique index blocks_chain_id_hash_height
+    on blocks (chain_id, block_hash, height);
 
 
 
@@ -63,11 +66,11 @@ create table transactions
 create index transactions_tx_hash
     on transactions (tx_hash);
 
-create index transactions_chain_id
-    on transactions (chain_id);
+create index transactions_chain_id_height
+    on transactions (chain_id, height);
 
-create index transactions_chain_id_hash
-    on transactions (chain_id, tx_hash);
+create unique index transactions_chain_id_hash_height
+    on transactions (chain_id, tx_hash, height);
 
 
 
@@ -78,21 +81,21 @@ create table address
     address_id         uuid default gen_random_uuid() not null
         primary key,   
     address_type    VARCHAR       not null,
-    address         VARCHAR       not null       UNIQUE,
+    addresses       VARCHAR       not null       UNIQUE,
     comment         VARCHAR       not null,
     created_at      timestamp with time zone     not null,
     updated_at      timestamp with time zone     not null
 );
 
 
-create index address_address
-    on address (address);
+create index address_addresses
+    on address (addresses);
 
 create index address_address_type
     on address (address_type);
 
-create index address_address_address_type
-    on address (address, address_type);
+create unique index address_address_addresses_type
+    on address (addresses, address_type);
 
 
 
@@ -126,6 +129,8 @@ create table alliance_claimdelegationrewards_msg
     FOREIGN KEY (validator_address_id) REFERENCES address(address_id)
 );
 
+create index alli_delegationrewards_tx_id
+    on alliance_claimdelegationrewards_msg (tx_id);
 
 create index alli_delegationrewards_delegator_address_id
     on alliance_claimdelegationrewards_msg (delegator_address_id);
@@ -153,7 +158,8 @@ create table cosmos_withdrawvalidatorcommission_msg
 create index cosmos_withdrawvalidatorcommission_validator_address_id
     on cosmos_withdrawvalidatorcommission_msg (validator_address_id);
 
-
+create index cosmos_withdrawvalidatorcommission_tx_id
+    on cosmos_withdrawvalidatorcommission_msg (tx_id);
 
 -- alliance_alliance_MsgClaimDelegate table
 
@@ -180,7 +186,8 @@ create index alli_delegate_delegator_address_id
 create index alli_delegate_validator_address_id
     on alliance_delegate_msg (validator_address_id);
 
-
+create index alli_delegate_tx_id
+    on alliance_delegate_msg (tx_id);
 
 -- alliance_alliance_MsgRedelegate table
 
@@ -212,7 +219,8 @@ create index alli_redelegate_validator_src_address_id
 create index alli_redelegate_validator_dst_address_id
     on alliance_redelegate_msg (validator_dst_address_id);
 
-
+create index alli_redelegate_tx_id
+    on alliance_redelegate_msg (tx_id);
 
 -- alliance_alliance_MsgUndelegate table
 
@@ -239,7 +247,8 @@ create index alli_undelegate_delegator_address_id
 create index alli_undelegate_validator_address_id
     on alliance_undelegate_msg (validator_address_id);
 
-
+create index alli_undelegate_tx_id
+    on alliance_undelegate_msg (tx_id);
 
 -- cosmos_authz_v1beta1_MsgExec table
 
@@ -261,7 +270,8 @@ create table cosmos_exec_msg
 create index cosmos_exec_receive_address_id
     on cosmos_exec_msg (receive_address_id);
 
-
+create index cosmos_exec_tx_id
+    on cosmos_exec_msg (tx_id);
 
 -- cosmos_authz_v1beta1_MsgGrant table 
 
@@ -291,6 +301,8 @@ create index cosmos_grant_receive_address_id
 create index cosmos_grant_send_address_id
     on cosmos_grant_msg (send_address_id);
 
+create index cosmos_grant_tx_id
+    on cosmos_grant_msg (tx_id);
 
 create table cosmos_grant_allowlist
 (
@@ -305,6 +317,8 @@ create table cosmos_grant_allowlist
 create index cosmos_grant_allowlist_addresses
     on cosmos_grant_allowlist (addresses);
 
+create index cosmos_grant_allowlist_message_id
+    on cosmos_grant_allowlist (message_id);
 
 -- cosmos_authz_v1beta1_MsgRevoke table 
 
@@ -330,6 +344,8 @@ create index cosmos_revoke_send_address_id
 create index cosmos_revoke_receive_address_id
     on cosmos_revoke_msg (receive_address_id);
 
+create index cosmos_revoke_tx_id
+    on cosmos_revoke_msg (tx_id);
 
 -- cosmos_bank_v1beta1_MsgSend table
 
@@ -353,10 +369,11 @@ create table cosmos_send_msg
 create index cosmos_send_from_address_id
     on cosmos_send_msg (from_address_id);
 
-create index cosmos_revoke_to_address_id
+create index cosmos_send_to_address_id
     on cosmos_send_msg (to_address_id);
 
-
+create index cosmos_send_tx_id
+    on cosmos_send_msg (tx_id);
 
 -- cosmos_distribution_v1beta1_MsgWithdrawDelegatorReward table
 
@@ -381,7 +398,8 @@ create index cosmos_withdrawdelegatorreward_delegator_address_id
 create index cosmos_withdrawdelegatorreward_validator_address_id
     on cosmos_withdrawdelegatorreward_msg (validator_address_id);
 
-
+create index cosmos_withdrawdelegatorreward_tx_id
+    on cosmos_withdrawdelegatorreward_msg (tx_id);
 
 -- cosmos_staking_v1beta1_MsgBeginRedelegate table
 
@@ -413,7 +431,8 @@ create index cosmos_beginredelegate_validator_src_address_id
 create index cosmos_beginredelegate_validator_dst_address_id
     on cosmos_beginredelegate_msg (validator_dst_address_id);
 
-
+create index cosmos_beginredelegate_tx_id
+    on cosmos_beginredelegate_msg (tx_id);
 
 -- cosmos_staking_v1beta1_MsgDelegate table
 
@@ -440,7 +459,8 @@ create index cosmos_delegate_delegator_address_id
 create index cosmos_delegate_validator_address_id
     on cosmos_delegate_msg (validator_address_id);
 
-
+create index cosmos_delegate_tx_id
+    on cosmos_delegate_msg (tx_id);
 
 -- cosmos_staking_v1beta1_MsgUndelegate table
 
@@ -467,7 +487,8 @@ create index cosmos_undelegate_delegator_address_id
 create index cosmos_undelegate_validator_address_id
     on cosmos_undelegate_msg (validator_address_id);
 
-
+create index cosmos_undelegate_tx_id
+    on cosmos_undelegate_msg (tx_id);
 
 -- cosmwasm_wasm_v1_MsgExecuteContract table   contracts to another table 
 
@@ -491,7 +512,8 @@ create table cosmwasm_executecontract_msg
 create index cosmwasm_executecontract_send_address_id
     on cosmwasm_executecontract_msg (send_address_id);
 
-
+create index cosmwasm_executecontract_tx_id
+    on cosmwasm_executecontract_msg (tx_id);
 
 -- cosmwasm_wasm_v1_MsgInstantiateContract table
 
@@ -521,7 +543,8 @@ create index cosmwasm_instantiatecontract_send_address_id
 create index cosmwasm_instantiatecontract_admin_address_id
     on cosmwasm_instantiatecontract_msg (admin_address_id);
 
-
+create index cosmwasm_instantiatecontract_tx_id
+    on cosmwasm_instantiatecontract_msg (tx_id);
 
 -- cosmwasm_wasm_v1_MsgStoreCode table
 
@@ -543,7 +566,8 @@ create table cosmwasm_storecode_msg
 create index cosmwasm_storecode_sender_address_id
     on cosmwasm_storecode_msg (sender_address_id);
 
-
+create index cosmwasm_storecode_tx_id
+    on cosmwasm_storecode_msg (tx_id);
 
 -- ibc_applications_transfer_v1_MsgTransfer table
 
@@ -576,7 +600,8 @@ create index ibc_transfer_sender_address_id
 create index ibc_transfer_receiver_address_id
     on ibc_transfer_msg (receiver_address_id);
 
-
+create index ibc_transfer_tx_id
+    on ibc_transfer_msg (tx_id);
 
 -- ibc_core_client_v1_MsgUpdateClient table
 
@@ -597,7 +622,8 @@ create table ibc_updateclient_msg
 create index ibc_updateclient_client_id
     on ibc_updateclient_msg (client_id);
 
-
+create index ibc_updateclient_tx_id
+    on ibc_updateclient_msg (tx_id);
 
 -- ibc.core.channel.v1.MsgTimeout table 
 
@@ -612,7 +638,7 @@ create table ibc_timeout_msg
     source_channel                  VARCHAR          not null,
     destination_port                VARCHAR          not null,
     destination_channel             VARCHAR          not null,
-    data                            VARCHAR          not null,
+    data_msg                        VARCHAR          not null,
     timeout_height_revision_number  VARCHAR          not null,
     timeout_height_revision_height  VARCHAR          not null,
     timeout_timestamp               VARCHAR          not null,
@@ -625,7 +651,8 @@ create table ibc_timeout_msg
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id)
 );
 
-
+create index ibc_timeout_tx_id
+    on ibc_timeout_msg (tx_id);
 
 -- ibc_core_channel_v1_MsgRecvPacket table
 
@@ -640,7 +667,7 @@ create table ibc_recvpacket_msg
     source_channel                  VARCHAR          not null,
     destination_port                VARCHAR          not null,
     destination_channel             VARCHAR          not null,
-    data                            VARCHAR          not null,
+    data_msg                        VARCHAR          not null,
     timeout_height_revision_number  VARCHAR          not null,
     timeout_height_revision_height  VARCHAR          not null,
     timeout_timestamp               VARCHAR          not null,
@@ -652,7 +679,8 @@ create table ibc_recvpacket_msg
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id)
 );
 
-
+create index ibc_recvpacket_tx_id
+    on ibc_recvpacket_msg (tx_id);
 
 -- ibc_core_channel_v1_MsgAcknowledgement table
 
@@ -667,7 +695,7 @@ create table ibc_acknowledgement_msg
     source_channel                  VARCHAR          not null,
     destination_port                VARCHAR          not null,
     destination_channel             VARCHAR          not null,
-    data                            VARCHAR          not null,
+    data_msg                        VARCHAR          not null,
     timeout_height_revision_number  VARCHAR          not null,
     timeout_height_revision_height  VARCHAR          not null,
     timeout_timestamp               VARCHAR          not null,
@@ -680,6 +708,8 @@ create table ibc_acknowledgement_msg
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id)
 );
 
+create index ibc_acknowledgement_tx_id
+    on ibc_acknowledgement_msg (tx_id);
 
 -- ibc.core.channel.v1.MsgChannelOpenConfirm table
 
@@ -699,7 +729,8 @@ create table ibc_channelopenconfirm_msg
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id)
 );
 
-
+create index ibc_channelopenconfirm_tx_id
+    on ibc_channelopenconfirm_msg (tx_id);
 
 -- ibc.core.channel.v1.MsgChannelOpenTry table
 
@@ -716,7 +747,7 @@ create table ibc_channelopentry_msg
     counterparty_port_id            VARCHAR          not null,
     counterparty_channel_id         VARCHAR          not null,
     connection_hops                 VARCHAR          not null,
-    version                         VARCHAR          not null,
+    version_num                     VARCHAR          not null,
     counterparty_version            VARCHAR          not null,
     proof_init                      VARCHAR          not null,
     proof_height_revision_number    VARCHAR          not null,
@@ -726,7 +757,8 @@ create table ibc_channelopentry_msg
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id)
 );
 
-
+create index ibc_channelopentry_tx_id
+    on ibc_channelopentry_msg (tx_id);
 
 -- cosmos.staking.v1beta1.MsgEditValidator Table
 
@@ -752,3 +784,6 @@ create table cosmos_editvalidator_msg
 
 create index cosmos_editvalidator_validator_address_id
     on cosmos_editvalidator_msg (validator_address_id);
+
+create index cosmos_editvalidator_tx_id
+    on cosmos_editvalidator_msg (tx_id);
