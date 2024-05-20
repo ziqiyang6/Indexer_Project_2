@@ -17,6 +17,10 @@ Version: 1.1
 Height now will also be loaded to transaction table, in which 'height' is a column  *
 Transaction hash now is included in transaction table as well                       *
                                                                                     *
+Version: 1.2                                                                        *
+For 'cursor.execute' command, there is 'try' and 'except' to catch UniqueViolation  *
+And if UniqueViolation happens, there will be search query to search needed value   *
+New package: psycopg2 now applies on this script                                    *
                                                                                     *
 **********************************************************************************'''
 
@@ -76,11 +80,16 @@ INSERT INTO transactions (block_id, tx_hash, chain_id, height, memo, fee_denom, 
 """
 values = (block_id, tx_hash, chain_id, height, memo, fee_denom, fee_amount, gas_limit, created_time, tx_info)
 
-cursor.execute(query, values)
+try:
+    cursor.execute(query, values)
+    tx_id = cursor.fetchone()[0]
+except errors.UniqueViolation as e:
+    connection.rollback()
+    search_query = f"SELECT tx_id FROM transactions WHERE block_id = '{block_id}'"
+    cursor.execute(search_query)
+    tx_id = cursor.fetchone()
 connection.commit()
 
-# Return the tx_id
-tx_id = cursor.fetchone()[0]
 
 
 # ----------------------------------------------------------- Line for message loading ---------------------
@@ -105,7 +114,10 @@ for message in decoded_response['tx']['body']['messages']:
     type = message['@type']
 
     # Load the type and height to type table
-    cursor.execute('INSERT INTO type (type, height) VALUES (%s, %s);', (type, height))
+    try:
+        cursor.execute('INSERT INTO type (type, height) VALUES (%s, %s);', (type, height))
+    except errors.UniqueViolation as e:
+        pass
     connection.commit()
 
     try:
