@@ -16,7 +16,10 @@ Version: 1.0                                                                    
 Version: 1.1                                                                        *
 Now the block hash is hex version                                                   *
                                                                                     *
-                                                                                    *
+Version: 1.2                                                                        *
+For 'cursor.execute' command, there is 'try' and 'except' to catch UniqueViolation  *
+And if UniqueViolation happens, there will be search query to search needed value   *
+New package: psycopg2 now applies on this script                                   *                                                                                    *
 **********************************************************************************'''
 
 #    Scripts start below
@@ -25,6 +28,7 @@ import json
 from functions import check_file
 from functions import create_connection
 from functions import block_hash_base64_to_hex
+from psycopg2 import errors
 
 with open('info.json', 'r') as f:
     info = json.load(f)
@@ -58,6 +62,9 @@ INSERT INTO blocks (block_hash, chain_id, height, tx_num, created_at) VALUES (%s
 values = (block_hash_hex, chain_id, height, tx_num, created_time)
 
 cursor = connection.cursor()
-cursor.execute(query, values)
+try:
+    cursor.execute(query, values)
+except errors.UniqueViolation as e:
+    pass
 connection.commit()
 cursor.close()
