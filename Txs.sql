@@ -10,8 +10,11 @@
 --- Version: 1.1                                                          -
 --- New indexes have been added, such as indexes for all tx_id in msg     -                                                                       
 ---                                                                       -
----                                                                       -   
--------------------------------------------------------------------------
+--- Version: 1.2                                                          -
+--- For transaction table and all message table, new column 'comment'     -
+--- has been added.
+--- For each table of message, the UNIQUE column has been changed.        -   
+---------------------------------------------------------------------------
 
 create extension if not exists "pgcrypto";
 
@@ -48,18 +51,19 @@ create table transactions
 (
     tx_id         uuid default gen_random_uuid() not null
         primary key,
-    block_id      uuid                       not null,
-    tx_hash         VARCHAR                   not null,
-    chain_id        VARCHAR                   not null,
-    height          VARCHAR             not null,    
-    memo       VARCHAR                  not null,   
-    fee_denom      VARCHAR              not null,
-    fee_amount     VARCHAR              not null,
-    gas_limit  VARCHAR                  not null,
-    created_at timestamp with time zone                     not null,
-    tx_info    jsonb                          not null,
+    block_id      uuid                          not null,
+    tx_hash         VARCHAR                     not null,
+    chain_id        VARCHAR                     not null,
+    height          VARCHAR                     not null,    
+    memo            VARCHAR                     not null,   
+    fee_denom       VARCHAR                     not null,
+    fee_amount      VARCHAR                     not null,
+    gas_limit       VARCHAR                     not null,
+    created_at timestamp with time zone         not null,
+    tx_info    jsonb                            not null,
+    comment         VARCHAR                     not null,
     FOREIGN KEY (block_id) REFERENCES blocks(block_id),
-    UNIQUE (chain_id, height)
+    UNIQUE(tx_hash, chain_id, height)
 );
 
 
@@ -81,10 +85,11 @@ create table address
     address_id         uuid default gen_random_uuid() not null
         primary key,   
     address_type    VARCHAR       not null,
-    addresses       VARCHAR       not null       UNIQUE,
+    addresses       VARCHAR       not null,
     comment         VARCHAR       not null,
     created_at      timestamp with time zone     not null,
-    updated_at      timestamp with time zone     not null
+    updated_at      timestamp with time zone     not null,
+    UNIQUE (address_type, addresses)
 );
 
 
@@ -118,15 +123,17 @@ create table alliance_claimdelegationrewards_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id                           uuid             not null     UNIQUE,
+    tx_id                           uuid             not null,
     delegator_address_id            uuid             not null,
     validator_address_id            uuid             not null,
     tx_type                         VARCHAR          not null,   
     tx_denom                        VARCHAR          not null,
     message_info                    jsonb            not null,
+    comment                         VARCHAR          not null,
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
     FOREIGN KEY (delegator_address_id) REFERENCES address(address_id),
-    FOREIGN KEY (validator_address_id) REFERENCES address(address_id)
+    FOREIGN KEY (validator_address_id) REFERENCES address(address_id),
+    UNIQUE(tx_id, comment)
 );
 
 create index alli_delegationrewards_tx_id
@@ -146,12 +153,14 @@ create table cosmos_withdrawvalidatorcommission_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id                           uuid             not null     UNIQUE,
+    tx_id                           uuid             not null,
     validator_address_id          uuid             not null,
     tx_type                       VARCHAR          not null,
     message_info                    jsonb            not null,
+    comment                         VARCHAR          not null,
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
-    FOREIGN KEY (validator_address_id) REFERENCES address(address_id)
+    FOREIGN KEY (validator_address_id) REFERENCES address(address_id),
+    UNIQUE(tx_id, comment)
 );
 
 
@@ -167,16 +176,18 @@ create table alliance_delegate_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id                           uuid             not null     UNIQUE,
+    tx_id                           uuid             not null,
     delegator_address_id          uuid             not null,
     validator_address_id          uuid             not null, 
     tx_type             VARCHAR          not null,   
     tx_denom            VARCHAR          not null,
     amount              VARCHAR         not null,
     message_info                    jsonb            not null,
+    comment                         VARCHAR          not null,
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
     FOREIGN KEY (delegator_address_id) REFERENCES address(address_id),
-    FOREIGN KEY (validator_address_id) REFERENCES address(address_id)
+    FOREIGN KEY (validator_address_id) REFERENCES address(address_id),
+    UNIQUE(tx_id, comment)
 );
 
 
@@ -195,7 +206,7 @@ create table alliance_redelegate_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id                           uuid             not null     UNIQUE,
+    tx_id                           uuid             not null,
     delegator_address_id              uuid             not null,
     validator_src_address_id          uuid             not null,
     validator_dst_address_id          uuid             not null,    
@@ -203,10 +214,12 @@ create table alliance_redelegate_msg
     tx_denom            VARCHAR          not null,
     amount              VARCHAR          not null,
     message_info                    jsonb            not null,
+    comment                         VARCHAR          not null,
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
     FOREIGN KEY (delegator_address_id) REFERENCES address(address_id),
     FOREIGN KEY (validator_src_address_id) REFERENCES address(address_id),
-    FOREIGN KEY (validator_dst_address_id) REFERENCES address(address_id)
+    FOREIGN KEY (validator_dst_address_id) REFERENCES address(address_id),
+    UNIQUE(tx_id, comment)
 );
 
 
@@ -228,16 +241,18 @@ create table alliance_undelegate_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id                           uuid             not null     UNIQUE,
+    tx_id                           uuid             not null,
     delegator_address_id          uuid             not null,
     validator_address_id          uuid             not null, 
     tx_type             VARCHAR          not null,   
     tx_denom            VARCHAR          not null,
     amount              VARCHAR         not null,
     message_info                    jsonb            not null,
+    comment                         VARCHAR          not null,
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
     FOREIGN KEY (delegator_address_id) REFERENCES address(address_id),
-    FOREIGN KEY (validator_address_id) REFERENCES address(address_id)
+    FOREIGN KEY (validator_address_id) REFERENCES address(address_id),
+    UNIQUE(tx_id, comment)
 );
 
 
@@ -256,13 +271,15 @@ create table cosmos_exec_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id                           uuid             not null     UNIQUE,
+    tx_id                           uuid             not null,
     receive_address_id          uuid             not null,
     tx_type             VARCHAR          not null,    
     msg_num             VARCHAR          not null,
     message_info                    jsonb            not null,
+    comment                         VARCHAR          not null,
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
-    FOREIGN KEY (receive_address_id) REFERENCES address(address_id)
+    FOREIGN KEY (receive_address_id) REFERENCES address(address_id),
+    UNIQUE(tx_id, comment)
 
 );
 
@@ -279,7 +296,7 @@ create table cosmos_grant_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id                           uuid             not null     UNIQUE,
+    tx_id                           uuid             not null,
     send_address_id          uuid             not null,
     receive_address_id          uuid             not null,
     tx_type             VARCHAR          not null,
@@ -289,9 +306,11 @@ create table cosmos_grant_msg
     msg                   VARCHAR        not null,
     expiration            VARCHAR        not null,
     message_info                    jsonb            not null,
+    comment                         VARCHAR          not null,
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
     FOREIGN KEY (send_address_id) REFERENCES address(address_id),
-    FOREIGN KEY (receive_address_id) REFERENCES address(address_id)
+    FOREIGN KEY (receive_address_id) REFERENCES address(address_id),
+    UNIQUE(tx_id, comment)
 );
 
 
@@ -308,7 +327,7 @@ create table cosmos_grant_allowlist
 (
     address_id      uuid default gen_random_uuid() not null
         primary key,
-    message_id      uuid                    not null    UNIQUE,
+    message_id      uuid                    not null   UNIQUE,
     addresses       VARCHAR                 not null,
     FOREIGN KEY (message_id) REFERENCES cosmos_grant_msg(message_id)
     
@@ -326,15 +345,17 @@ create table cosmos_revoke_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id                           uuid             not null     UNIQUE,
+    tx_id                           uuid             not null,
     send_address_id     uuid             not null,
     receive_address_id  uuid             not null,
     tx_type             VARCHAR          not null,
     msg_type_url        VARCHAR         not null,
     message_info                    jsonb            not null,
+    comment                         VARCHAR          not null,
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
     FOREIGN KEY (send_address_id) REFERENCES address(address_id),
-    FOREIGN KEY (receive_address_id) REFERENCES address(address_id)
+    FOREIGN KEY (receive_address_id) REFERENCES address(address_id),
+    UNIQUE(tx_id, comment)
 );
 
 
@@ -353,16 +374,18 @@ create table cosmos_send_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id                           uuid             not null     UNIQUE,
+    tx_id                           uuid             not null,
     from_address_id          uuid             not null,
     to_address_id          uuid             not null,    
     tx_type             VARCHAR          not null,
     tx_denom            VARCHAR          not null,
     amount              VARCHAR          not null,
     message_info                    jsonb            not null,
+    comment                         VARCHAR          not null,
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
     FOREIGN KEY (from_address_id) REFERENCES address(address_id),
-    FOREIGN KEY (to_address_id) REFERENCES address(address_id)
+    FOREIGN KEY (to_address_id) REFERENCES address(address_id),
+    UNIQUE(tx_id, comment)
 );
 
 
@@ -381,14 +404,16 @@ create table cosmos_withdrawdelegatorreward_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id                           uuid             not null     UNIQUE,
+    tx_id                           uuid             not null,
     delegator_address_id          uuid             not null,
     validator_address_id          uuid             not null,    
     tx_type             VARCHAR          not null,
     message_info                    jsonb            not null,
+    comment                         VARCHAR          not null,
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
     FOREIGN KEY (delegator_address_id) REFERENCES address(address_id),
-    FOREIGN KEY (validator_address_id) REFERENCES address(address_id)
+    FOREIGN KEY (validator_address_id) REFERENCES address(address_id),
+    UNIQUE(tx_id, comment)
 );
 
 
@@ -407,7 +432,7 @@ create table cosmos_beginredelegate_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id                           uuid             not null     UNIQUE,
+    tx_id                           uuid             not null,
     delegator_address_id              uuid             not null,
     validator_src_address_id          uuid             not null,
     validator_dst_address_id          uuid             not null,    
@@ -415,10 +440,12 @@ create table cosmos_beginredelegate_msg
     tx_denom            VARCHAR          not null,
     amount              VARCHAR          not null,
     message_info                    jsonb            not null,
+    comment                         VARCHAR          not null,
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
     FOREIGN KEY (delegator_address_id) REFERENCES address(address_id),
     FOREIGN KEY (validator_src_address_id) REFERENCES address(address_id),
-    FOREIGN KEY (validator_dst_address_id) REFERENCES address(address_id)
+    FOREIGN KEY (validator_dst_address_id) REFERENCES address(address_id),
+    UNIQUE(tx_id, comment)
 );
 
 
@@ -440,16 +467,18 @@ create table cosmos_delegate_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id                           uuid             not null     UNIQUE,
+    tx_id                           uuid             not null,
     delegator_address_id          uuid             not null,
     validator_address_id          uuid             not null, 
     tx_type             VARCHAR          not null,   
     tx_denom            VARCHAR          not null,
     amount              VARCHAR         not null,
     message_info                    jsonb            not null,
+    comment                         VARCHAR          not null,
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
     FOREIGN KEY (delegator_address_id) REFERENCES address(address_id),
-    FOREIGN KEY (validator_address_id) REFERENCES address(address_id)
+    FOREIGN KEY (validator_address_id) REFERENCES address(address_id),
+    UNIQUE(tx_id, comment)
 );
 
 
@@ -468,16 +497,18 @@ create table cosmos_undelegate_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id                           uuid             not null     UNIQUE,
+    tx_id                           uuid             not null,
     delegator_address_id          uuid             not null,
     validator_address_id          uuid             not null, 
     tx_type             VARCHAR          not null,   
     tx_denom            VARCHAR          not null,
     amount              VARCHAR         not null,
     message_info                    jsonb            not null,
+    comment                         VARCHAR          not null,
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
     FOREIGN KEY (delegator_address_id) REFERENCES address(address_id),
-    FOREIGN KEY (validator_address_id) REFERENCES address(address_id)
+    FOREIGN KEY (validator_address_id) REFERENCES address(address_id),
+    UNIQUE(tx_id, comment)
 );
 
 
@@ -496,7 +527,7 @@ create table cosmwasm_executecontract_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id                           uuid             not null     UNIQUE,
+    tx_id                           uuid             not null,
     send_address_id          uuid             not null,    
     tx_type             VARCHAR          not null,
     contracts           VARCHAR         not null,
@@ -504,8 +535,10 @@ create table cosmwasm_executecontract_msg
     tx_denom            VARCHAR        not null,
     amount              VARCHAR          not null,
     message_info                    jsonb            not null,
+    comment                         VARCHAR          not null,
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
-    FOREIGN KEY (send_address_id) REFERENCES address(address_id)
+    FOREIGN KEY (send_address_id) REFERENCES address(address_id),
+    UNIQUE(tx_id, comment)
 );
 
 
@@ -521,7 +554,7 @@ create table cosmwasm_instantiatecontract_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id                           uuid             not null     UNIQUE,
+    tx_id                           uuid             not null,
     send_address_id          uuid             not null,
     admin_address_id    uuid             not null, 
     tx_type             VARCHAR          not null,
@@ -530,9 +563,11 @@ create table cosmwasm_instantiatecontract_msg
     msg                 VARCHAR          not null,
     funds               VARCHAR          not null,
     message_info                    jsonb            not null,
+    comment                         VARCHAR          not null,
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
     FOREIGN KEY (send_address_id) REFERENCES address(address_id),
-    FOREIGN KEY (admin_address_id) REFERENCES address(address_id)
+    FOREIGN KEY (admin_address_id) REFERENCES address(address_id),
+    UNIQUE(tx_id, comment)
 
 );
 
@@ -552,14 +587,16 @@ create table cosmwasm_storecode_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id                           uuid             not null     UNIQUE,
+    tx_id                           uuid             not null,
     sender_address_id          uuid             not null,    
     tx_type             VARCHAR          not null,
     wasm_byte_code          VARCHAR          not null,
     instantiate_permission  VARCHAR         not null,
     message_info                    jsonb            not null,
+    comment                         VARCHAR          not null,
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
-    FOREIGN KEY (sender_address_id) REFERENCES address(address_id)
+    FOREIGN KEY (sender_address_id) REFERENCES address(address_id),
+    UNIQUE(tx_id, comment)
 );
 
 
@@ -575,7 +612,7 @@ create table ibc_transfer_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id                           uuid             not null     UNIQUE,
+    tx_id                           uuid             not null,
     sender_address_id                       uuid             not null,
     receiver_address_id                     uuid             not null,    
     tx_type                                 VARCHAR          not null,
@@ -588,9 +625,11 @@ create table ibc_transfer_msg
     timeout_timestamp                       VARCHAR          not null,
     memo                                    VARCHAR          not null,
     message_info                    jsonb            not null,
+    comment                         VARCHAR          not null,
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
     FOREIGN KEY (sender_address_id) REFERENCES address(address_id),
-    FOREIGN KEY (receiver_address_id) REFERENCES address(address_id)
+    FOREIGN KEY (receiver_address_id) REFERENCES address(address_id),
+    UNIQUE(tx_id, comment)
 );
 
 
@@ -609,13 +648,15 @@ create table ibc_updateclient_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id                           uuid             not null     UNIQUE,    
+    tx_id                           uuid             not null,    
     tx_type                         VARCHAR          not null,
     client_id                       VARCHAR          not null,
     client_message                  jsonb              not null,
     signer                          VARCHAR          not null,
     message_info                    jsonb            not null,
-    FOREIGN KEY (tx_id) REFERENCES transactions(tx_id)
+    comment                         VARCHAR          not null,
+    FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
+    UNIQUE(tx_id, comment)
 );
 
 
@@ -631,7 +672,7 @@ create table ibc_timeout_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id                           uuid             not null     UNIQUE,    
+    tx_id                           uuid             not null,    
     tx_type                         VARCHAR          not null,
     sequence_num                    VARCHAR          not null,
     source_port                     VARCHAR          not null,
@@ -648,7 +689,9 @@ create table ibc_timeout_msg
     next_seq_recv                   VARCHAR          not null,
     signer                          VARCHAR          not null,
     message_info                    jsonb            not null,
-    FOREIGN KEY (tx_id) REFERENCES transactions(tx_id)
+    comment                         VARCHAR          not null,
+    FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
+    UNIQUE(tx_id, comment)
 );
 
 create index ibc_timeout_tx_id
@@ -660,7 +703,7 @@ create table ibc_recvpacket_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id                           uuid             not null     UNIQUE,    
+    tx_id                           uuid             not null,    
     tx_type                         VARCHAR          not null,
     sequence_num                    VARCHAR          not null,
     source_port                     VARCHAR          not null,
@@ -676,7 +719,9 @@ create table ibc_recvpacket_msg
     proof_height_revision_height    VARCHAR          not null,
     signer                          VARCHAR          not null,
     message_info                    jsonb            not null,
-    FOREIGN KEY (tx_id) REFERENCES transactions(tx_id)
+    comment                         VARCHAR          not null,
+    FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
+    UNIQUE(tx_id, comment)
 );
 
 create index ibc_recvpacket_tx_id
@@ -688,7 +733,7 @@ create table ibc_acknowledgement_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id                           uuid             not null     UNIQUE,    
+    tx_id                           uuid             not null,    
     tx_type                         VARCHAR          not null,
     sequence_num                    VARCHAR          not null,
     source_port                     VARCHAR          not null,
@@ -705,7 +750,9 @@ create table ibc_acknowledgement_msg
     proof_height_revision_height    VARCHAR          not null,
     signer                          VARCHAR          not null,
     message_info                    jsonb            not null,
-    FOREIGN KEY (tx_id) REFERENCES transactions(tx_id)
+    comment                         VARCHAR          not null,
+    FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
+    UNIQUE(tx_id, comment)
 );
 
 create index ibc_acknowledgement_tx_id
@@ -717,7 +764,7 @@ create table ibc_channelopenconfirm_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id                           uuid             not null     UNIQUE,    
+    tx_id                           uuid             not null,    
     tx_type                         VARCHAR          not null,
     port_id                         VARCHAR          not null,
     channel_id                      VARCHAR          not null,
@@ -726,7 +773,9 @@ create table ibc_channelopenconfirm_msg
     proof_height_revision_height    VARCHAR          not null,
     signer                          VARCHAR          not null,
     message_info                    jsonb            not null,
-    FOREIGN KEY (tx_id) REFERENCES transactions(tx_id)
+    comment                         VARCHAR          not null,
+    FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
+    UNIQUE(tx_id, comment)
 );
 
 create index ibc_channelopenconfirm_tx_id
@@ -738,7 +787,7 @@ create table ibc_channelopentry_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id                           uuid             not null     UNIQUE,    
+    tx_id                           uuid             not null,    
     tx_type                         VARCHAR          not null,
     port_id                         VARCHAR          not null,
     previous_channel_id             VARCHAR          not null,
@@ -754,7 +803,9 @@ create table ibc_channelopentry_msg
     proof_height_revision_height    VARCHAR          not null,
     signer                          VARCHAR          not null,
     message_info                    jsonb            not null,
-    FOREIGN KEY (tx_id) REFERENCES transactions(tx_id)
+    comment                         VARCHAR          not null,
+    FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
+    UNIQUE(tx_id, comment)
 );
 
 create index ibc_channelopentry_tx_id
@@ -766,7 +817,7 @@ create table cosmos_editvalidator_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
-    tx_id                           uuid             not null     UNIQUE,
+    tx_id                           uuid             not null,
     validator_address_id            uuid             not null,    
     tx_type                         VARCHAR          not null,
     description_moniker             VARCHAR          not null,
@@ -777,8 +828,10 @@ create table cosmos_editvalidator_msg
     commission_rate                 VARCHAR          not null,
     min_self_delegation             VARCHAR          not null,
     message_info                    jsonb            not null,
+    comment                         VARCHAR          not null,
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
-    FOREIGN KEY (validator_address_id) REFERENCES address(address_id)
+    FOREIGN KEY (validator_address_id) REFERENCES address(address_id),
+    UNIQUE(tx_id, comment)
 );
 
 
