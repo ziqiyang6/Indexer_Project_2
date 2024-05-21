@@ -21,6 +21,7 @@ Version: 1.2                                                                    
 For 'cursor.execute' command, there is 'try' and 'except' to catch UniqueViolation  *
 And if UniqueViolation happens, there will be search query to search needed value   *
 New package: psycopg2 now applies on this script                                    *
+New column 'comment' for transaction table has been added                           *
                                                                                     *
 **********************************************************************************'''
 
@@ -35,7 +36,7 @@ import address_load
 import os
 from pathlib import Path
 import sys
-
+from psycopg2 import  errors
 
 # import the login info for psql from 'info.json'
 with open('info.json', 'r') as f:
@@ -57,6 +58,7 @@ file_name = os.getenv('FILE_NAME')
 # Set the values that will be loaded to database
 content = check_file(file_path, file_name)
 num = os.getenv('x')
+print(num)
 # decoded_response = decode_tx(content['block']['data']['txs'][int(num)])
 transaction_string = content['block']['data']['txs'][int(num)]
 decoded_response = decode_tx(transaction_string)
@@ -72,13 +74,15 @@ fee_denom = decoded_response['tx']['auth_info']['fee']['amount'][0]['denom']
 fee_amount = decoded_response['tx']['auth_info']['fee']['amount'][0]['amount']
 gas_limit = decoded_response['tx']['auth_info']['fee']['gas_limit']
 created_time = content['block']['header']['time']
+order = int(num) + 1
+comment = f'This is number {order} transaction in BLOCK {height}'
 tx_info = json.dumps(decoded_response)
 
 # Edit the query that will be loaded to the database
 query = """
-INSERT INTO transactions (block_id, tx_hash, chain_id, height, memo, fee_denom, fee_amount, gas_limit, created_at, tx_info) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING tx_id;
+INSERT INTO transactions (block_id, tx_hash, chain_id, height, memo, fee_denom, fee_amount, gas_limit, created_at, tx_info, comment) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING tx_id;
 """
-values = (block_id, tx_hash, chain_id, height, memo, fee_denom, fee_amount, gas_limit, created_time, tx_info)
+values = (block_id, tx_hash, chain_id, height, memo, fee_denom, fee_amount, gas_limit, created_time, tx_info, comment)
 
 try:
     cursor.execute(query, values)
@@ -87,7 +91,7 @@ except errors.UniqueViolation as e:
     connection.rollback()
     search_query = f"SELECT tx_id FROM transactions WHERE block_id = '{block_id}'"
     cursor.execute(search_query)
-    tx_id = cursor.fetchone()
+    tx_id = cursor.fetchone()[0]
 connection.commit()
 
 
@@ -100,7 +104,9 @@ with open('type.json', 'r') as f:
 
 
 # Use FOR LOOP to load every message in the transaction
+i = 1
 for message in decoded_response['tx']['body']['messages']:
+
 
     ids = {}
     for key in message:
@@ -132,16 +138,18 @@ for message in decoded_response['tx']['body']['messages']:
         table = importlib.import_module(table_type)
         # If the message contains the address, address_id will be added
         if len(ids) > 0:
-            table.main(tx_id,  type, message, ids)
+            table.main(tx_id, i, type, message, ids)
         # If not, address_id will not
         else:
-            table.main(tx_id,  type, message)
+            table.main(tx_id, i, type, message)
     except KeyError:
         print(f'Did not find {type} in type.json file')
     except AttributeError:
         print(f'Script {table_type} does not have a main function')
     except ImportError:
         print(f'Script {table_type} could not be found')
+
+    i += 1
 
 cursor.close()
 connection.close()
