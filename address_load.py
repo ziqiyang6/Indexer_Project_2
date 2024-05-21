@@ -1,6 +1,27 @@
+#!/usr/bin/python3
+'''**********************************************************************************
+                                                                                    *
+Project Name: address_load.py                                                         *
+                                                                                    *
+Programming Language: Python 3.11                                                   *
+                                                                                    *
+Libraries: json                                                                     *
+                                                                                    *
+Creater Name: Ziqi Yang                                                             *
+                                                                                    *
+Published Date: 4/15/2024                                                           *
+                                                                                    *
+Version: 1.0                                                                        *
+                                                                                    *
+                                                                                    *
+                                                                                    *
+**********************************************************************************'''
+
+#    Scripts start below
 from functions import create_connection
 from datetime import datetime
 import json
+from psycopg2 import errors
 
 def main(key, address):
 
@@ -29,8 +50,15 @@ def main(key, address):
 
 
     values = (key, address, comment, created_time, updated_time)
-    cursor.execute(query, values)
-    address_id  = cursor.fetchone()[0]
+    try:
+        cursor.execute(query, values)
+        address_id = cursor.fetchone()[0]
+
+    except errors.UniqueViolation as e:
+        connection.rollback()
+        search_query = f"SELECT address_id FROM address WHERE addresses = '{address}'"
+        cursor.execute(search_query)
+        address_id = cursor.fetchone()[0]
 
     connection.commit()
     connection.close()
