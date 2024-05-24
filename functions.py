@@ -23,7 +23,10 @@ All of them are included in original Python                                     
                                                                                     *  
 Version: 1.2                                                                        *
 Function 'decode_tx' has been updated. The old url had been changed to new url      *
-'https://terra-rest.publicnode.com/cosmos/tx/v1beta1/decode'                         *
+'https://terra-rest.publicnode.com/cosmos/tx/v1beta1/decode'                        *
+                                                                                    *
+Version: 1.3                                                                        *
+Function 'new_type' has been created to store new message type if there is          *
 **********************************************************************************'''
 
 #    Functions start below
@@ -626,55 +629,28 @@ def Validate_json(content, file_name):
         print(ve, file=sys.stderr)
 
 
-def load_check_type(type_value, height, file_path):
+def new_type(message, file_path, height, transaction_num, message_num):
 
-        unique = True
+        path = f'{file_path}/new_type.txt'
 
         # Check if the file exist
-        if not os.path.isfile(file_path):
-            print(f"File does not exist. Creating '{file_path}'...")
+        if not os.path.isfile(path):
+            print(f"File does not exist. Creating '{path}'...")
             try:
                 # Use 'x' mode to create the file
-                with open(file_path, 'x') as file:
-                    print(f"File '{file_path}' created successfully.")
+                with open(path, 'x') as file:
+                    print(f"File '{path}' created successfully.")
             except FileExistsError:
                 pass
-
-        # Read the content of 'types.txt' file
-        try:
-            with open(file_path, 'r') as file:
-                existing_values = file.read().splitlines()
-                # Check if this type is unique
-                if type_value in existing_values:
-                    unique = False
-        except FileNotFoundError:
-            # If the file does not exist, it will be checked as an empty file
-            pass
 
         # If and only if the type is unique, it will be stored.
-        if unique:
-            with open(file_path, 'a') as file:  # Use 'a' mode to append the content
-                file.write(type_value + '\n')
-                file.write(height + '\n' + '\n')
+        with open(path, 'a') as file:  # Use 'a' mode to append the content
+            file.write(f"The message is the No. {message_num} message in No. {transaction_num} transaction  from block {height} \n")
+            file.write(message + '\n' + '\n')
 
 
 
 
-def type_height_json(json_file, type_value, height, tx_output_path):
-        json_file_path = tx_output_path + type_value + height
-
-        # Check if the file exist
-        if not os.path.isfile(json_file_path):
-            print(f"File does not exist. Creating '{json_file_path}'...")
-            try:
-                # Use 'x' mode to create the file
-                with open(json_file_path, 'x') as file:
-                    print(f"File '{json_file_path}' created successfully.")
-            except FileExistsError:
-                pass
-
-        with open(json_file_path, 'w') as f:
-            json.dump(json_file, f, indent=4)
 
 
 def decode_tx(tx, max_retries=3, retry_delay=2):
