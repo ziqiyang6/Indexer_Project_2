@@ -23,17 +23,16 @@ Version: 1.0                                                                    
 ####    Scripts start below
 import os
 import sys
+import json
 from functions import check_file
 from functions import height_check
 from functions import Validate_json
-from functions import load_check_type
+from functions import new_type
 from functions import type_height_json
 from functions import decode_tx
 
 
 
-
-tx_output_path = os.getenv('txt_file_path')
 file_path = os.getenv('FILE_PATH')
 file_name = os.getenv('FILE_NAME')
 
@@ -49,18 +48,7 @@ if Validate_json(result, file_name) == 1:
     # If there is no transaction in this block, end this progress
     if count == 0:
         sys.exit(10)
-
-    # Use decode_tx function for each tx in this block
-    for i in range(count):
-        # let decoded_response be the decoded string
-        decoded_response = decode_tx(result["block"]["data"]["txs"][i])
-        for message in decoded_response["tx"]["body"]["messages"]:
-
-            types = message["@type"]  # Take out the type of the transaction and store into 'types'
-
-            load_check_type(types, height, tx_output_path)
-            #type_height_json(decoded_response, types)
-    print()
-    sys.exit(0)
+    else:
+        sys.exit(0)
 else:
    sys.exit(8)
