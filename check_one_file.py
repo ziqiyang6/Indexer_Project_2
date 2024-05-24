@@ -28,7 +28,6 @@ from functions import check_file
 from functions import height_check
 from functions import Validate_json
 from functions import new_type
-from functions import type_height_json
 from functions import decode_tx
 
 
