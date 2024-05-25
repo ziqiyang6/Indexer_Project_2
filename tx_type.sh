@@ -55,7 +55,7 @@ while getopts ":h" opt; do
 done
 
 # info.json path
-export info_path=$HOME/Indexer-Project/info.json # Change this to correct path of info.json!!
+export info_path=/Users/shikh/Library/CloudStorage/OneDrive-Personal/Documents/EMR/olaf-indexer/info.json # Change this to correct path of info.json!!
 
 # Set the path of directory and cd to it
 folder_path=$(eval echo $(jq -r '.path.block_file_path' $info_path))
@@ -102,15 +102,21 @@ DBPORT=$(jq -r '.psql.db_port' $info_path)
 # Connect to psql
 PGPASSWORD=$DBPASSWORD psql -d $DBNAME -U $DBUSER -h localhost -f Txs.sql
 
-
 # Select the files in the folder path and run python script 4
 for file_name in $files; do
+    # if folder_path does not end with /, add / to the end
+    if [[ $folder_path != */ ]]; then
+        folder_path="${folder_path}/"
+    fi
     export FILE_PATH="${folder_path}${file_name}"
     export FILE_NAME="${file_name}"
     export txt_file_path=$(eval echo $(jq -r '.path.txt_file_path' $info_path))
-    python3 check_one_file.py >> $LOG 2>> $ERR 
+    python check_one_file.py >> $LOG 2>> $ERR 
     echo "The exit code of $FILE_NAME is $? (expected 0)"
-    python3 loading_files.py >> $LOG 2>> $ERR 
+    python loading_files.py >> $LOG 2>> $ERR 
+    echo "The exit code of loading $FILE_NAME is $? (expected 0)"
+    python verify_block.py >> $LOG 2>> $ERR
+    echo "The exit code of verifying $FILE_NAME is $? (expected 0)"
 
     # Define the length of transaction
     length=$(jq '.block.data.txs | length' "$FILE_PATH")
@@ -121,7 +127,7 @@ for file_name in $files; do
         # For every i less than the length of transaction, make it as the ith transaction in the block
         for ((i = 0; i < $length; i++)); do
            export x=$i
-           python3 loading_tx.py >> $LOG 2>> $ERR 
+           python loading_tx.py >> $LOG 2>> $ERR 
         done
 
     else
