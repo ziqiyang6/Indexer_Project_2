@@ -1,16 +1,16 @@
 {
     "psql" : {
-        "db_name" : "zydb",
-        "db_user" : "zyang",
-        "db_password" : "Tabind99",
+        "db_name": "indexer",
+        "db_user": "shikh",
+        "db_password": "",
         "db_host" :"localhost",
-        "db_port" : "5433"
+        "db_port": "5432"
     },
     "path" : {
-        "output_path" : "$HOME/Indexer-Project/txs_type_report_1",
-        "block_file_path" : "$HOME/Indexer-Project/test_blocks/",
-        "script_path" : "$HOME/Indexer-Project",
-        "types_script_path" : "$HOME/Indexer-Project/types_script/",
-        "txt_file_path" : "/home/zyang/bin/types_2.txt"
+        "output_path": "/Users/shikh/Library/CloudStorage/OneDrive-Personal/Documents/EMR/olaf-indexer/txs_type_report_1",
+        "block_file_path": "/Users/shikh/Library/CloudStorage/OneDrive-Personal/Documents/EMR/olaf-indexer/test_blocks",
+        "script_path": "/Users/shikh/Library/CloudStorage/OneDrive-Personal/Documents/EMR/olaf-indexer",
+        "types_script_path": "/Users/shikh/Library/CloudStorage/OneDrive-Personal/Documents/EMR/olaf-indexer/types_script/",
+        "txt_file_path": "/Users/shikh/Library/CloudStorage/OneDrive-Personal/Documents/EMR/olaf-indexer/types_2.txt"
     }
 }
