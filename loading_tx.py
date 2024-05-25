@@ -23,20 +23,26 @@ And if UniqueViolation happens, there will be search query to search needed valu
 New package: psycopg2 now applies on this script                                    *
 New column 'comment' for transaction table has been added                           *
                                                                                     *
+Version: 1.3                                                                        *
+new function 'new_type' has been added. It can print the message of new type to     *
+another text file.                                                                  *
+KeyError output now can be printed into error log instead of output log             *
+                                                                                    *
 **********************************************************************************'''
 
 #    Scripts start below
-from functions import check_file
-from functions import create_connection
-from functions import decode_tx
-from functions import hash_to_hex
+import sys
 import json
 import importlib
 import address_load
 import os
+from functions import check_file
+from functions import create_connection
+from functions import decode_tx
+from functions import hash_to_hex
+from functions import new_type
 from pathlib import Path
-import sys
-from psycopg2 import  errors
+from psycopg2 import errors
 
 # import the login info for psql from 'info.json'
 with open('info.json', 'r') as f:
@@ -54,11 +60,11 @@ cursor = connection.cursor()
 # Set the path of file
 file_path = os.getenv('FILE_PATH')
 file_name = os.getenv('FILE_NAME')
+output_path = os.getenv('txt')
 
 # Set the values that will be loaded to database
 content = check_file(file_path, file_name)
 num = os.getenv('x')
-print(num)
 # decoded_response = decode_tx(content['block']['data']['txs'][int(num)])
 transaction_string = content['block']['data']['txs'][int(num)]
 decoded_response = decode_tx(transaction_string)
@@ -107,6 +113,15 @@ with open('type.json', 'r') as f:
 i = 1
 for message in decoded_response['tx']['body']['messages']:
 
+    # Define the type of message to find the corresponding python script
+    type = message['@type']
+
+    try:
+        table_type = type_json[type]
+        print(table_type)
+    except KeyError:
+        new_type(str(message), output_path, height, order , i)
+        continue
 
     ids = {}
     for key in message:
@@ -116,8 +131,7 @@ for message in decoded_response['tx']['body']['messages']:
             address = message[key]
             ids[f'{key}_id'] = address_load.main(key, address)
 
-    # Define the type of message to find the corresponding python script
-    type = message['@type']
+
 
     # Load the type and height to type table
     try:
@@ -127,28 +141,25 @@ for message in decoded_response['tx']['body']['messages']:
     connection.commit()
 
     try:
-        # Find the corresponding value by matching the key
-        table_type = type_json[type]
-        print(table_type)
         # Go to the diectory that contains the scripts
-        module_path = Path(f"{info['path']['types_script_path']}")
+        module_path = Path(info['path']['types_script_path'])
         expanded_script_path = os.path.expanduser(module_path)
         sys.path.append(expanded_script_path)
+
         # Import the corresponding script
         table = importlib.import_module(table_type)
         # If the message contains the address, address_id will be added
         if len(ids) > 0:
-            table.main(tx_id, i, type, message, ids)
+            table.main(tx_id, i, order, type, message, ids)
         # If not, address_id will not
         else:
-            table.main(tx_id, i, type, message)
+            table.main(tx_id, i, order, type, message)
     except KeyError:
-        print(f'Did not find {type} in type.json file')
+        print(f'KeyError happened', file=sys.stderr)
     except AttributeError:
-        print(f'Script {table_type} does not have a main function')
+        print(f'Script {table_type} does not have a main function', file=sys.stderr)
     except ImportError:
-        print(f'Script {table_type} could not be found')
-
+        print(f'Script {table_type} could not be found', file=sys.stderr)
     i += 1
 
 cursor.close()

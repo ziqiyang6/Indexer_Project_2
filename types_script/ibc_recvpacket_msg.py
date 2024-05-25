@@ -22,6 +22,10 @@ And if UniqueViolation happens, there will be search query to search needed valu
 New package: psycopg2 now applies on this script                                    *
 New column 'comment' for transaction table has been added                           *                                                                                    *
                                                                                     *
+Version: 1.3                                                                        *
+Comment has been updated. tx_id has been replaced to transaction order.             *
+KeyError output now can be printed into error log instead of output log             *
+                                                                                    *
 **********************************************************************************'''
 
 #    Scripts start below
@@ -29,7 +33,7 @@ from functions import create_connection
 import json
 from psycopg2 import errors
 
-def main(tx_id, num, tx_type, message):
+def main(tx_id, message_no, transaction_no, tx_type, message):
 
     # import the login info for psql from 'info.json'
     with open('info.json', 'r') as f:
@@ -65,7 +69,7 @@ def main(tx_id, num, tx_type, message):
         proof_height_revision_height = message['proof_height']['revision_height']
         signer = message['signer']
         message = json.dumps(message)
-        comment = f'This is number {num} message in transaction {tx_id}'
+        comment = f'This is number {message_no} message in number {transaction_no} transaction '
 
         values = (tx_id, tx_type, sequence, source_port, source_channel, destination_port, destination_channel, data, timeout_height_revision_num, timeout_height_revision_height, timeout_timestamp, proof_commitment, proof_height_revision_number, proof_height_revision_height, signer, message, comment)
         cursor.execute(query, values)
@@ -74,9 +78,9 @@ def main(tx_id, num, tx_type, message):
         connection.close()
 
     except KeyError:
-        print(f'KeyError happens in type {tx_type}')
+        print(f'KeyError happens in type {tx_type}', file=sys.stderr)
     except errors.UniqueViolation as e:
         pass
 
 if __name__ == '__main__':
-    main(tx_id, tx_type, message)
+    main(tx_id, message_no, transaction_no, tx_type, message)
