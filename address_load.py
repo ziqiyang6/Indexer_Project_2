@@ -13,7 +13,9 @@ Published Date: 4/15/2024                                                       
                                                                                     *
 Version: 1.0                                                                        *
                                                                                     *
-                                                                                    *
+Version: 1.1
+Now 'address_load' only needs one input. Also, the info of 'address_type' has
+changed to only three condition, 'user', 'validator', and 'contract'.               *
                                                                                     *
 **********************************************************************************'''
 
@@ -22,8 +24,9 @@ from functions import create_connection
 from datetime import datetime
 import json
 from psycopg2 import errors
+import sys
 
-def main(key, address):
+def main(address):
 
     with open('info.json', 'r') as f:
         info = json.load(f)
@@ -41,6 +44,20 @@ def main(key, address):
     created_time = datetime.now()
     updated_time = created_time
 
+    index_of_1 = address.find('1')
+    substring_after_1 = address[index_of_1 + 1:]
+    length_after_1 = len(substring_after_1)
+    validator = 'valoper'
+    if validator in address:
+        address_type = 'validator'
+    elif length_after_1 != 38:
+        address_type = 'contract'
+    elif length_after_1 == 38:
+        address_type = 'user'
+    else:
+        address_type = 'Unknown'
+        print("The type of address could not be detected, check address", file=sys.stderr)
+
     query = """
     INSERT INTO address (address_type, addresses, comment, created_at, updated_at) VALUES (%s, %s, %s, %s, %s)
     RETURNING address_id;
@@ -49,7 +66,7 @@ def main(key, address):
 
 
 
-    values = (key, address, comment, created_time, updated_time)
+    values = (address_type, address, comment, created_time, updated_time)
     try:
         cursor.execute(query, values)
         address_id = cursor.fetchone()[0]
@@ -65,4 +82,4 @@ def main(key, address):
     return address_id
 
 if __name__ == '__main__':
-    main(key, address)
+    main(address)
