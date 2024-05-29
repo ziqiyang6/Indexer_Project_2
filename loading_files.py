@@ -52,7 +52,7 @@ chain_id = content['block']['header']['chain_id']
 height = content['block']['header']['height']
 tx_num = len(content['block']['data']['txs'])
 created_time = content['block']['header']['time']
-print(block_hash, chain_id, height, tx_num, created_time)
+
 
 
 query = """
