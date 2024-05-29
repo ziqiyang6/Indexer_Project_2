@@ -13,7 +13,12 @@
 --- Version: 1.2                                                          -
 --- For transaction table and all message table, new column 'comment'     -
 --- has been added.
---- For each table of message, the UNIQUE column has been changed.        -   
+--- For each table of message, the UNIQUE column has been changed.        -
+---                                                                       -
+--- Version: 1.3                                                          -
+--- There are two more message tables added, 'multisend' and 'vote'.      -
+--- The 'address' table has been updated. The unique column has been      -
+--- limited to 'addresses' itself.                                        -
 ---------------------------------------------------------------------------
 
 create extension if not exists "pgcrypto";
@@ -89,7 +94,7 @@ create table address
     comment         VARCHAR       not null,
     created_at      timestamp with time zone     not null,
     updated_at      timestamp with time zone     not null,
-    UNIQUE (address_type, addresses)
+    UNIQUE (addresses)
 );
 
 
@@ -840,3 +845,75 @@ create index cosmos_editvalidator_validator_address_id
 
 create index cosmos_editvalidator_tx_id
     on cosmos_editvalidator_msg (tx_id);
+
+
+-- cosmos.gov.v1.MsgVote Table
+
+create table cosmos_vote_msg
+(
+    message_id         uuid default gen_random_uuid() not null
+        primary key,
+    tx_id                           uuid             not null,
+    tx_type                         VARCHAR          not null,
+    proposal_id                     VARCHAR          not null,
+    voter_address_id                uuid             not null,
+    options                         VARCHAR          not null,
+    metadata                        VARCHAR          not null,
+    message_info                    jsonb            not null,
+    comment                         VARCHAR          not null,
+    FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
+    FOREIGN KEY (voter_address_id) REFERENCES address(address_id),
+    UNIQUE(tx_id, comment)
+);
+
+create index cosmos_vote_voter_address_id
+    on cosmos_vote_msg (voter_address_id);
+
+create index cosmos_vote_tx_id
+    on cosmos_vote_msg (tx_id);
+
+
+
+-- cosmos.bank.v1beta1.MsgMultiSend Table
+
+create table cosmos_multisend_msg
+(
+    message_id         uuid default gen_random_uuid() not null
+        primary key,
+    tx_id                           uuid             not null,
+    tx_type                         VARCHAR          not null,
+    inputs_address_id               uuid            not null,
+    inputs_denom                    VARCHAR          not null,
+    inputs_amount                   VARCHAR          not null,
+    message_info                    jsonb            not null,
+    comment                         VARCHAR          not null,
+    FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
+    FOREIGN KEY (inputs_address_id) REFERENCES address(address_id),
+    UNIQUE(tx_id, comment)
+);
+
+create index cosmos_multisend_inputs_address_id
+    on cosmos_multisend_msg (inputs_address_id);
+
+create index cosmos_multisend_tx_id
+    on cosmos_multisend_msg (tx_id);
+
+
+create table cosmos_multisend_outputs
+(
+    id         uuid default gen_random_uuid() not null
+        primary key,
+    message_id                       uuid             not null,
+    outputs_address_id               uuid          not null,
+    outputs_denom                    VARCHAR          not null,
+    outputs_amount                   VARCHAR          not null,
+    FOREIGN KEY (message_id) REFERENCES cosmos_multisend_msg(message_id),
+    FOREIGN KEY (outputs_address_id) REFERENCES address(address_id),
+    UNIQUE(outputs_address_id, outputs_denom, outputs_amount)
+);
+
+create index cosmos_multisend_outputs_address_id
+    on cosmos_multisend_outputs (outputs_address_id);
+
+create index cosmos_multisend_message_id
+    on cosmos_multisend_outputs (message_id);
