@@ -22,5 +22,7 @@
     "/ibc.core.channel.v1.MsgTimeout" : "ibc_timeout_msg",
     "/ibc.core.channel.v1.MsgChannelOpenConfirm" : "ibc_channelopenconfirm_msg",
     "/ibc.core.channel.v1.MsgChannelOpenTry" : "ibc_channelopentry_msg",
-    "/cosmos.staking.v1beta1.MsgEditValidator" : "cosmos_editvalidator_msg"
-}
+    "/cosmos.staking.v1beta1.MsgEditValidator" : "cosmos_editvalidator_msg",
+    "/cosmos.gov.v1.MsgVote" : "cosmos_vote_msg",
+    "/cosmos.bank.v1beta1.MsgMultiSend" : "cosmos_multisend_msg"
+}   
