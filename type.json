@@ -24,5 +24,6 @@
     "/ibc.core.channel.v1.MsgChannelOpenTry" : "ibc_channelopentry_msg",
     "/cosmos.staking.v1beta1.MsgEditValidator" : "cosmos_editvalidator_msg",
     "/cosmos.gov.v1.MsgVote" : "cosmos_vote_msg",
+    "/cosmos.gov.v1beta1.MsgVote" : "cosmos_vote_beta1_msg",
     "/cosmos.bank.v1beta1.MsgMultiSend" : "cosmos_multisend_msg"
 }   
