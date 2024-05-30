@@ -19,6 +19,11 @@
 --- There are two more message tables added, 'multisend' and 'vote'.      -
 --- The 'address' table has been updated. The unique column has been      -
 --- limited to 'addresses' itself.                                        -
+---
+--- Version: 1.4 
+--- New type 'cosmos_vote_beta1_msg' has been added. The only difference  -
+--- between this type and 'cosmos_vote_msg' is that this table does not   -
+--- have 'metadata' column.                                               -
 ---------------------------------------------------------------------------
 
 create extension if not exists "pgcrypto";
@@ -871,6 +876,31 @@ create index cosmos_vote_voter_address_id
 
 create index cosmos_vote_tx_id
     on cosmos_vote_msg (tx_id);
+
+
+-- cosmos.gov.v1beta1.MsgVote Table
+
+create table cosmos_vote_beta1_msg
+(
+    message_id         uuid default gen_random_uuid() not null
+        primary key,
+    tx_id                           uuid             not null,
+    tx_type                         VARCHAR          not null,
+    proposal_id                     VARCHAR          not null,
+    voter_address_id                uuid             not null,
+    options                         VARCHAR          not null,
+    message_info                    jsonb            not null,
+    comment                         VARCHAR          not null,
+    FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
+    FOREIGN KEY (voter_address_id) REFERENCES address(address_id),
+    UNIQUE(tx_id, comment)
+);
+
+create index cosmos_vote_beta1_voter_address_id
+    on cosmos_vote_beta1_msg (voter_address_id);
+
+create index cosmos_vote_beta1_tx_id
+    on cosmos_vote_beta1_msg (tx_id);
 
 
 
