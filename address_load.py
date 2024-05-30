@@ -40,20 +40,27 @@ def main(address):
     connection = create_connection(db_name, db_user, db_password, db_host, db_port)
     cursor = connection.cursor()
 
+    # Define the values
     comment = ''
     created_time = datetime.now()
     updated_time = created_time
 
+    # Find the index of number 1 in the string
     index_of_1 = address.find('1')
+    # Count the length after 1
     substring_after_1 = address[index_of_1 + 1:]
     length_after_1 = len(substring_after_1)
+    # If the string contains 'valoper' string, this is a validator address
     validator = 'valoper'
     if validator in address:
         address_type = 'validator'
-    elif length_after_1 != 38:
+    # If the length larger than 38, this is a contract address
+    elif length_after_1 >= 38:
         address_type = 'contract'
+    # If the length after 1 equals 38, this is a user address
     elif length_after_1 == 38:
         address_type = 'user'
+    # If the address does not belong to three types above, it will be an unknown type
     else:
         address_type = 'Unknown'
         print("The type of address could not be detected, check address", file=sys.stderr)
@@ -65,7 +72,7 @@ def main(address):
     """
 
 
-
+    # Load the values
     values = (address_type, address, comment, created_time, updated_time)
     try:
         cursor.execute(query, values)
