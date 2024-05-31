@@ -23,7 +23,8 @@
 --- Version: 1.4 
 --- New type 'cosmos_vote_beta1_msg' has been added. The only difference  -
 --- between this type and 'cosmos_vote_msg' is that this table does not   -
---- have 'metadata' column.                                               -
+--- have 'metadata' column.
+--- Also, new type 'cosmos_unjail_msg' has been added.                    -
 ---------------------------------------------------------------------------
 
 create extension if not exists "pgcrypto";
@@ -947,3 +948,26 @@ create index cosmos_multisend_outputs_address_id
 
 create index cosmos_multisend_message_id
     on cosmos_multisend_outputs (message_id);
+
+
+-- /cosmos.slashing.v1beta1.MsgUnjail Table
+
+create table cosmos_unjail_msg
+(
+    message_id         uuid default gen_random_uuid() not null
+        primary key,
+    tx_id                           uuid             not null,
+    tx_type                         VARCHAR          not null,
+    validator_addr_id               uuid            not null,
+    message_info                    jsonb            not null,
+    comment                         VARCHAR          not null,
+    FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
+    FOREIGN KEY (validator_addr_id) REFERENCES address(address_id),
+    UNIQUE(tx_id, comment)
+);
+
+create index cosmos_unjail_validator_address_id
+    on cosmos_unjail_msg (validator_addr_id);
+
+create index cosmos_unjail_tx_id
+    on cosmos_unjail_msg (tx_id);
