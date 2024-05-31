@@ -40,6 +40,7 @@ if the command above does not work, run the following:
 ```
 bash tx_type.sh
 ```
-
+# ERD
+[Uploading ERD.pdf…]()
 
 
