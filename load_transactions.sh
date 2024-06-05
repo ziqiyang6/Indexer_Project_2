@@ -19,9 +19,9 @@
 #                   exit 8 ---- The transaction was not loaded into the database. 	#
 #                   exit 9 --- Error in executing Txs.sql                    		#
 #                                                                               	#
-# DEVELOPER: Olaf Yang                                                      		#
+# DEVELOPER: Olaf Yang and Shikhar Gupta                                      		#
 # DEVELOPER PHONE: +1 (516) 503-6032                                            	#
-# DEVELOPER EMAIL: ziqiyang91@gmail.com                                              	#
+# DEVELOPER EMAIL: ziqiyang91@gmail.com, shikhar.gupta.tx@gmail.com                    	#
 #                                                                               	#
 # VERSION: 1.0                                                                  	#
 #											#
@@ -29,9 +29,13 @@
 # The path has been updated to info.json file, which means the path			#
 # can be changed manually								#
 # Loading files are applied in this version						#
+#											#
+# VERSION: 1.2										#
+# Filename update and arguments added.							#
+# Verification of blocks check added.							#
 #                                                                               	#
-#***************************************************************************************	#
-#
+#***************************************************************************************#
+
 
 # Define the shell functions
 usage(){
@@ -171,11 +175,6 @@ for file_name in $files; do
             die "$FILE_NAME does not pass the JSON validation. (Exit code $?). Check log file for more information" 5
         elif [[ $verbose == true ]]; then
             echo -e "$FILE_NAME passes the JSON validation."
-        fi
-        if [[ $? == 10 ]]; then
-            echo -e "No transaction in $FILE_NAME, skip loading transaction."
-            block_count=$((block_count+1))
-            continue
         fi
         python3 loading_files.py >> $LOG 2>> $ERR
         if [[ $? -ne 0 ]]; then
