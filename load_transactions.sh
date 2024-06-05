@@ -1,36 +1,36 @@
 #!/usr/bin/env bash
-#*******************************************************************************#
-#                                                                               #
-# FILE: load_transactions.sh                                                       #
-#                                                                               #
-# USAGE: load_transactions.sh -c <path> [-t] [-h] [-v]                                                  #
-#                                                                               #
-# DESCRIPTION: This is a description of the script.                             #
-#                                                                               #
-# OPTIONS: List options for the script [-h]                                     #
-#                                                                               #
-# ERROR CONDITIONS: exit 1 ---- Invalid option                                   #                      
-#                   exit 2 ---- library is not installed
-#                   exit 3 ---- The config file does not exist
-#                   exit 4 ---- Cannot change to the target directory    
-#                   exit 5 ---- The block does not pass the validation test.
-#                   exit 6 ---- The block was not successfully loaded into the database. #
-#                   exit 7 ---- The block does not pass the verification test.  
-#                   exit 8 ---- The transaction was not loaded into the database. #
-#                   exit 9 --- Error in executing Txs.sql                    #
-#                                                                               #
-# DEVELOPER: Olaf Yang                                                      #
-# DEVELOPER PHONE: +1 (516) 503-6032                                            #
-# DEVELOPER EMAIL: ziqiyang91@gmail.com                                              #
-#                                                                               #
-# VERSION: 1.0                                                                  #
-#										#
-# VERSION: 1.1									#
-# The path has been updated to info.json file, which means the path		#
-# can be changed manually							#
-# Loading files are applied in this version					#
-#                                                                               #
-#*******************************************************************************#
+#***************************************************************************************#
+#                                                                               	#
+# FILE: load_transactions.sh                                                    	#
+#                                                                               	#
+# USAGE: load_transactions.sh -c <path> [-t] [-h] [-v]                          	#
+#                                                                               	#
+# DESCRIPTION: This is a description of the script.                             	#
+#                                                                               	#
+# OPTIONS: List options for the script [-h]                                     	#
+#                                                                               	#
+# ERROR CONDITIONS: exit 1 ---- Invalid option                                   	#     	                 
+#                   exit 2 ---- library is not installed				#
+#                   exit 3 ---- The config file does not exist				#
+#                   exit 4 ---- Cannot change to the target directory    		#
+#                   exit 5 ---- The block does not pass the validation test.		#
+#                   exit 6 ---- The block was not successfully loaded into the database.#
+#                   exit 7 ---- The block does not pass the verification test.  	#
+#                   exit 8 ---- The transaction was not loaded into the database. 	#
+#                   exit 9 --- Error in executing Txs.sql                    		#
+#                                                                               	#
+# DEVELOPER: Olaf Yang                                                      		#
+# DEVELOPER PHONE: +1 (516) 503-6032                                            	#
+# DEVELOPER EMAIL: ziqiyang91@gmail.com                                              	#
+#                                                                               	#
+# VERSION: 1.0                                                                  	#
+#											#
+# VERSION: 1.1										#
+# The path has been updated to info.json file, which means the path			#
+# can be changed manually								#
+# Loading files are applied in this version						#
+#                                                                               	#
+#***************************************************************************************	#
 #
 
 # Define the shell functions
