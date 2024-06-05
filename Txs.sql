@@ -26,12 +26,13 @@
 --- have 'metadata' column.
 --- Also, new type 'cosmos_unjail_msg' has been added.                    -
 ---------------------------------------------------------------------------
+SET client_min_messages TO WARNING;
 
 create extension if not exists "pgcrypto";
 
 -- Block table 
 
-create table blocks
+create table if not exists blocks
 (
     block_id        uuid default gen_random_uuid() not null
         primary key,    
@@ -45,20 +46,20 @@ create table blocks
 
 
 
-create index blocks_block_hash
+create index if not exists blocks_block_hash
     on blocks (block_hash);
 
-create index blocks_chain_id_height
+create index if not exists blocks_chain_id_height
     on blocks (chain_id,height);
 
-create unique index blocks_chain_id_hash_height
+create unique index if not exists blocks_chain_id_hash_height
     on blocks (chain_id, block_hash, height);
 
 
 
 -- Transactions table
 
-create table transactions
+create table if not exists transactions
 (
     tx_id         uuid default gen_random_uuid() not null
         primary key,
@@ -78,20 +79,20 @@ create table transactions
 );
 
 
-create index transactions_tx_hash
+create index if not exists transactions_tx_hash
     on transactions (tx_hash);
 
-create index transactions_chain_id_height
+create index if not exists transactions_chain_id_height
     on transactions (chain_id, height);
 
-create unique index transactions_chain_id_hash_height
+create unique index if not exists transactions_chain_id_hash_height
     on transactions (chain_id, tx_hash, height);
 
 
 
 -- address table for all types of addresses
 
-create table address 
+create table if not exists address 
 (
     address_id         uuid default gen_random_uuid() not null
         primary key,   
@@ -104,20 +105,20 @@ create table address
 );
 
 
-create index address_addresses
+create index if not exists address_addresses
     on address (addresses);
 
-create index address_address_type
+create index if not exists address_address_type
     on address (address_type);
 
-create unique index address_address_addresses_type
+create unique index if not exists address_address_addresses_type
     on address (addresses, address_type);
 
 
 
 -- type table 
 
-create table type
+create table if not exists type
 (   
    id           uuid default gen_random_uuid() not null
         primary key,
@@ -130,7 +131,7 @@ create table type
 
 -- alliance_alliance_MsgClaimDelegationRewards table
 
-create table alliance_claimdelegationrewards_msg
+create table if not exists alliance_claimdelegationrewards_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
@@ -147,20 +148,20 @@ create table alliance_claimdelegationrewards_msg
     UNIQUE(tx_id, comment)
 );
 
-create index alli_delegationrewards_tx_id
+create index if not exists alli_delegationrewards_tx_id
     on alliance_claimdelegationrewards_msg (tx_id);
 
-create index alli_delegationrewards_delegator_address_id
+create index if not exists alli_delegationrewards_delegator_address_id
     on alliance_claimdelegationrewards_msg (delegator_address_id);
 
-create index alli_delegationrewards_validator_address_id
+create index if not exists alli_delegationrewards_validator_address_id
     on alliance_claimdelegationrewards_msg (validator_address_id);
 
 
 
 -- cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission
 
-create table cosmos_withdrawvalidatorcommission_msg
+create table if not exists cosmos_withdrawvalidatorcommission_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
@@ -175,15 +176,15 @@ create table cosmos_withdrawvalidatorcommission_msg
 );
 
 
-create index cosmos_withdrawvalidatorcommission_validator_address_id
+create index if not exists cosmos_withdrawvalidatorcommission_validator_address_id
     on cosmos_withdrawvalidatorcommission_msg (validator_address_id);
 
-create index cosmos_withdrawvalidatorcommission_tx_id
+create index if not exists cosmos_withdrawvalidatorcommission_tx_id
     on cosmos_withdrawvalidatorcommission_msg (tx_id);
 
 -- alliance_alliance_MsgClaimDelegate table
 
-create table alliance_delegate_msg
+create table if not exists alliance_delegate_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
@@ -202,18 +203,18 @@ create table alliance_delegate_msg
 );
 
 
-create index alli_delegate_delegator_address_id
+create index if not exists alli_delegate_delegator_address_id
     on alliance_delegate_msg (delegator_address_id);
 
-create index alli_delegate_validator_address_id
+create index if not exists alli_delegate_validator_address_id
     on alliance_delegate_msg (validator_address_id);
 
-create index alli_delegate_tx_id
+create index if not exists alli_delegate_tx_id
     on alliance_delegate_msg (tx_id);
 
 -- alliance_alliance_MsgRedelegate table
 
-create table alliance_redelegate_msg
+create table if not exists alliance_redelegate_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
@@ -234,21 +235,21 @@ create table alliance_redelegate_msg
 );
 
 
-create index alli_redelegate_delegator_address_id
+create index if not exists alli_redelegate_delegator_address_id
     on alliance_redelegate_msg (delegator_address_id);
 
-create index alli_redelegate_validator_src_address_id
+create index if not exists alli_redelegate_validator_src_address_id
     on alliance_redelegate_msg (validator_src_address_id);
 
-create index alli_redelegate_validator_dst_address_id
+create index if not exists alli_redelegate_validator_dst_address_id
     on alliance_redelegate_msg (validator_dst_address_id);
 
-create index alli_redelegate_tx_id
+create index if not exists alli_redelegate_tx_id
     on alliance_redelegate_msg (tx_id);
 
 -- alliance_alliance_MsgUndelegate table
 
-create table alliance_undelegate_msg
+create table if not exists alliance_undelegate_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
@@ -267,18 +268,18 @@ create table alliance_undelegate_msg
 );
 
 
-create index alli_undelegate_delegator_address_id
+create index if not exists alli_undelegate_delegator_address_id
     on alliance_undelegate_msg (delegator_address_id);
 
-create index alli_undelegate_validator_address_id
+create index if not exists alli_undelegate_validator_address_id
     on alliance_undelegate_msg (validator_address_id);
 
-create index alli_undelegate_tx_id
+create index if not exists alli_undelegate_tx_id
     on alliance_undelegate_msg (tx_id);
 
 -- cosmos_authz_v1beta1_MsgExec table
 
-create table cosmos_exec_msg
+create table if not exists cosmos_exec_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
@@ -295,15 +296,15 @@ create table cosmos_exec_msg
 );
 
 
-create index cosmos_exec_receive_address_id
+create index if not exists cosmos_exec_receive_address_id
     on cosmos_exec_msg (receive_address_id);
 
-create index cosmos_exec_tx_id
+create index if not exists cosmos_exec_tx_id
     on cosmos_exec_msg (tx_id);
 
 -- cosmos_authz_v1beta1_MsgGrant table 
 
-create table cosmos_grant_msg
+create table if not exists cosmos_grant_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
@@ -325,16 +326,16 @@ create table cosmos_grant_msg
 );
 
 
-create index cosmos_grant_receive_address_id
+create index if not exists cosmos_grant_receive_address_id
     on cosmos_grant_msg (receive_address_id);
 
-create index cosmos_grant_send_address_id
+create index if not exists cosmos_grant_send_address_id
     on cosmos_grant_msg (send_address_id);
 
-create index cosmos_grant_tx_id
+create index if not exists cosmos_grant_tx_id
     on cosmos_grant_msg (tx_id);
 
-create table cosmos_grant_allowlist
+create table if not exists cosmos_grant_allowlist
 (
     address_id      uuid default gen_random_uuid() not null
         primary key,
@@ -344,15 +345,15 @@ create table cosmos_grant_allowlist
     
 );
 
-create index cosmos_grant_allowlist_addresses
+create index if not exists cosmos_grant_allowlist_addresses
     on cosmos_grant_allowlist (addresses);
 
-create index cosmos_grant_allowlist_message_id
+create index if not exists cosmos_grant_allowlist_message_id
     on cosmos_grant_allowlist (message_id);
 
 -- cosmos_authz_v1beta1_MsgRevoke table 
 
-create table cosmos_revoke_msg
+create table if not exists cosmos_revoke_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
@@ -370,18 +371,18 @@ create table cosmos_revoke_msg
 );
 
 
-create index cosmos_revoke_send_address_id
+create index if not exists cosmos_revoke_send_address_id
     on cosmos_revoke_msg (send_address_id);
 
-create index cosmos_revoke_receive_address_id
+create index if not exists cosmos_revoke_receive_address_id
     on cosmos_revoke_msg (receive_address_id);
 
-create index cosmos_revoke_tx_id
+create index if not exists cosmos_revoke_tx_id
     on cosmos_revoke_msg (tx_id);
 
 -- cosmos_bank_v1beta1_MsgSend table
 
-create table cosmos_send_msg
+create table if not exists cosmos_send_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
@@ -400,18 +401,18 @@ create table cosmos_send_msg
 );
 
 
-create index cosmos_send_from_address_id
+create index if not exists cosmos_send_from_address_id
     on cosmos_send_msg (from_address_id);
 
-create index cosmos_send_to_address_id
+create index if not exists cosmos_send_to_address_id
     on cosmos_send_msg (to_address_id);
 
-create index cosmos_send_tx_id
+create index if not exists cosmos_send_tx_id
     on cosmos_send_msg (tx_id);
 
 -- cosmos_distribution_v1beta1_MsgWithdrawDelegatorReward table
 
-create table cosmos_withdrawdelegatorreward_msg
+create table if not exists cosmos_withdrawdelegatorreward_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
@@ -428,18 +429,18 @@ create table cosmos_withdrawdelegatorreward_msg
 );
 
 
-create index cosmos_withdrawdelegatorreward_delegator_address_id
+create index if not exists cosmos_withdrawdelegatorreward_delegator_address_id
     on cosmos_withdrawdelegatorreward_msg (delegator_address_id);
 
-create index cosmos_withdrawdelegatorreward_validator_address_id
+create index if not exists cosmos_withdrawdelegatorreward_validator_address_id
     on cosmos_withdrawdelegatorreward_msg (validator_address_id);
 
-create index cosmos_withdrawdelegatorreward_tx_id
+create index if not exists cosmos_withdrawdelegatorreward_tx_id
     on cosmos_withdrawdelegatorreward_msg (tx_id);
 
 -- cosmos_staking_v1beta1_MsgBeginRedelegate table
 
-create table cosmos_beginredelegate_msg
+create table if not exists cosmos_beginredelegate_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
@@ -460,21 +461,21 @@ create table cosmos_beginredelegate_msg
 );
 
 
-create index cosmos_beginredelegate_delegator_address_id
+create index if not exists cosmos_beginredelegate_delegator_address_id
     on cosmos_beginredelegate_msg (delegator_address_id);
 
-create index cosmos_beginredelegate_validator_src_address_id
+create index if not exists cosmos_beginredelegate_validator_src_address_id
     on cosmos_beginredelegate_msg (validator_src_address_id);
 
-create index cosmos_beginredelegate_validator_dst_address_id
+create index if not exists cosmos_beginredelegate_validator_dst_address_id
     on cosmos_beginredelegate_msg (validator_dst_address_id);
 
-create index cosmos_beginredelegate_tx_id
+create index if not exists cosmos_beginredelegate_tx_id
     on cosmos_beginredelegate_msg (tx_id);
 
 -- cosmos_staking_v1beta1_MsgDelegate table
 
-create table cosmos_delegate_msg
+create table if not exists cosmos_delegate_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
@@ -493,18 +494,18 @@ create table cosmos_delegate_msg
 );
 
 
-create index cosmos_delegate_delegator_address_id
+create index if not exists cosmos_delegate_delegator_address_id
     on cosmos_delegate_msg (delegator_address_id);
 
-create index cosmos_delegate_validator_address_id
+create index if not exists cosmos_delegate_validator_address_id
     on cosmos_delegate_msg (validator_address_id);
 
-create index cosmos_delegate_tx_id
+create index if not exists cosmos_delegate_tx_id
     on cosmos_delegate_msg (tx_id);
 
 -- cosmos_staking_v1beta1_MsgUndelegate table
 
-create table cosmos_undelegate_msg
+create table if not exists cosmos_undelegate_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
@@ -523,18 +524,18 @@ create table cosmos_undelegate_msg
 );
 
 
-create index cosmos_undelegate_delegator_address_id
+create index if not exists cosmos_undelegate_delegator_address_id
     on cosmos_undelegate_msg (delegator_address_id);
 
-create index cosmos_undelegate_validator_address_id
+create index if not exists cosmos_undelegate_validator_address_id
     on cosmos_undelegate_msg (validator_address_id);
 
-create index cosmos_undelegate_tx_id
+create index if not exists cosmos_undelegate_tx_id
     on cosmos_undelegate_msg (tx_id);
 
 -- cosmwasm_wasm_v1_MsgExecuteContract table   contracts to another table 
 
-create table cosmwasm_executecontract_msg
+create table if not exists cosmwasm_executecontract_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
@@ -553,15 +554,15 @@ create table cosmwasm_executecontract_msg
 );
 
 
-create index cosmwasm_executecontract_send_address_id
+create index if not exists cosmwasm_executecontract_send_address_id
     on cosmwasm_executecontract_msg (send_address_id);
 
-create index cosmwasm_executecontract_tx_id
+create index if not exists cosmwasm_executecontract_tx_id
     on cosmwasm_executecontract_msg (tx_id);
 
 -- cosmwasm_wasm_v1_MsgInstantiateContract table
 
-create table cosmwasm_instantiatecontract_msg
+create table if not exists cosmwasm_instantiatecontract_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
@@ -583,18 +584,18 @@ create table cosmwasm_instantiatecontract_msg
 );
 
 
-create index cosmwasm_instantiatecontract_send_address_id
+create index if not exists cosmwasm_instantiatecontract_send_address_id
     on cosmwasm_instantiatecontract_msg (send_address_id);
 
-create index cosmwasm_instantiatecontract_admin_address_id
+create index if not exists cosmwasm_instantiatecontract_admin_address_id
     on cosmwasm_instantiatecontract_msg (admin_address_id);
 
-create index cosmwasm_instantiatecontract_tx_id
+create index if not exists cosmwasm_instantiatecontract_tx_id
     on cosmwasm_instantiatecontract_msg (tx_id);
 
 -- cosmwasm_wasm_v1_MsgStoreCode table
 
-create table cosmwasm_storecode_msg
+create table if not exists cosmwasm_storecode_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
@@ -611,15 +612,15 @@ create table cosmwasm_storecode_msg
 );
 
 
-create index cosmwasm_storecode_sender_address_id
+create index if not exists cosmwasm_storecode_sender_address_id
     on cosmwasm_storecode_msg (sender_address_id);
 
-create index cosmwasm_storecode_tx_id
+create index if not exists cosmwasm_storecode_tx_id
     on cosmwasm_storecode_msg (tx_id);
 
 -- ibc_applications_transfer_v1_MsgTransfer table
 
-create table ibc_transfer_msg
+create table if not exists ibc_transfer_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
@@ -644,18 +645,18 @@ create table ibc_transfer_msg
 );
 
 
-create index ibc_transfer_sender_address_id
+create index if not exists ibc_transfer_sender_address_id
     on ibc_transfer_msg (sender_address_id);
 
-create index ibc_transfer_receiver_address_id
+create index if not exists ibc_transfer_receiver_address_id
     on ibc_transfer_msg (receiver_address_id);
 
-create index ibc_transfer_tx_id
+create index if not exists ibc_transfer_tx_id
     on ibc_transfer_msg (tx_id);
 
 -- ibc_core_client_v1_MsgUpdateClient table
 
-create table ibc_updateclient_msg
+create table if not exists ibc_updateclient_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
@@ -671,15 +672,15 @@ create table ibc_updateclient_msg
 );
 
 
-create index ibc_updateclient_client_id
+create index if not exists ibc_updateclient_client_id
     on ibc_updateclient_msg (client_id);
 
-create index ibc_updateclient_tx_id
+create index if not exists ibc_updateclient_tx_id
     on ibc_updateclient_msg (tx_id);
 
 -- ibc.core.channel.v1.MsgTimeout table 
 
-create table ibc_timeout_msg
+create table if not exists ibc_timeout_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
@@ -705,12 +706,12 @@ create table ibc_timeout_msg
     UNIQUE(tx_id, comment)
 );
 
-create index ibc_timeout_tx_id
+create index if not exists ibc_timeout_tx_id
     on ibc_timeout_msg (tx_id);
 
 -- ibc_core_channel_v1_MsgRecvPacket table
 
-create table ibc_recvpacket_msg
+create table if not exists ibc_recvpacket_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
@@ -735,12 +736,12 @@ create table ibc_recvpacket_msg
     UNIQUE(tx_id, comment)
 );
 
-create index ibc_recvpacket_tx_id
+create index if not exists ibc_recvpacket_tx_id
     on ibc_recvpacket_msg (tx_id);
 
 -- ibc_core_channel_v1_MsgAcknowledgement table
 
-create table ibc_acknowledgement_msg
+create table if not exists ibc_acknowledgement_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
@@ -766,12 +767,12 @@ create table ibc_acknowledgement_msg
     UNIQUE(tx_id, comment)
 );
 
-create index ibc_acknowledgement_tx_id
+create index if not exists ibc_acknowledgement_tx_id
     on ibc_acknowledgement_msg (tx_id);
 
 -- ibc.core.channel.v1.MsgChannelOpenConfirm table
 
-create table ibc_channelopenconfirm_msg
+create table if not exists ibc_channelopenconfirm_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
@@ -789,12 +790,12 @@ create table ibc_channelopenconfirm_msg
     UNIQUE(tx_id, comment)
 );
 
-create index ibc_channelopenconfirm_tx_id
+create index if not exists ibc_channelopenconfirm_tx_id
     on ibc_channelopenconfirm_msg (tx_id);
 
 -- ibc.core.channel.v1.MsgChannelOpenTry table
 
-create table ibc_channelopentry_msg
+create table if not exists ibc_channelopentry_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
@@ -819,12 +820,12 @@ create table ibc_channelopentry_msg
     UNIQUE(tx_id, comment)
 );
 
-create index ibc_channelopentry_tx_id
+create index if not exists ibc_channelopentry_tx_id
     on ibc_channelopentry_msg (tx_id);
 
 -- cosmos.staking.v1beta1.MsgEditValidator Table
 
-create table cosmos_editvalidator_msg
+create table if not exists cosmos_editvalidator_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
@@ -846,16 +847,16 @@ create table cosmos_editvalidator_msg
 );
 
 
-create index cosmos_editvalidator_validator_address_id
+create index if not exists cosmos_editvalidator_validator_address_id
     on cosmos_editvalidator_msg (validator_address_id);
 
-create index cosmos_editvalidator_tx_id
+create index if not exists cosmos_editvalidator_tx_id
     on cosmos_editvalidator_msg (tx_id);
 
 
 -- cosmos.gov.v1.MsgVote Table
 
-create table cosmos_vote_msg
+create table if not exists cosmos_vote_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
@@ -872,16 +873,16 @@ create table cosmos_vote_msg
     UNIQUE(tx_id, comment)
 );
 
-create index cosmos_vote_voter_address_id
+create index if not exists cosmos_vote_voter_address_id
     on cosmos_vote_msg (voter_address_id);
 
-create index cosmos_vote_tx_id
+create index if not exists cosmos_vote_tx_id
     on cosmos_vote_msg (tx_id);
 
 
 -- cosmos.gov.v1beta1.MsgVote Table
 
-create table cosmos_vote_beta1_msg
+create table if not exists cosmos_vote_beta1_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
@@ -897,17 +898,17 @@ create table cosmos_vote_beta1_msg
     UNIQUE(tx_id, comment)
 );
 
-create index cosmos_vote_beta1_voter_address_id
+create index if not exists cosmos_vote_beta1_voter_address_id
     on cosmos_vote_beta1_msg (voter_address_id);
 
-create index cosmos_vote_beta1_tx_id
+create index if not exists cosmos_vote_beta1_tx_id
     on cosmos_vote_beta1_msg (tx_id);
 
 
 
 -- cosmos.bank.v1beta1.MsgMultiSend Table
 
-create table cosmos_multisend_msg
+create table if not exists cosmos_multisend_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
@@ -923,14 +924,14 @@ create table cosmos_multisend_msg
     UNIQUE(tx_id, comment)
 );
 
-create index cosmos_multisend_inputs_address_id
+create index if not exists cosmos_multisend_inputs_address_id
     on cosmos_multisend_msg (inputs_address_id);
 
-create index cosmos_multisend_tx_id
+create index if not exists cosmos_multisend_tx_id
     on cosmos_multisend_msg (tx_id);
 
 
-create table cosmos_multisend_outputs
+create table if not exists cosmos_multisend_outputs
 (
     id         uuid default gen_random_uuid() not null
         primary key,
@@ -943,16 +944,16 @@ create table cosmos_multisend_outputs
     UNIQUE(outputs_address_id, outputs_denom, outputs_amount)
 );
 
-create index cosmos_multisend_outputs_address_id
+create index if not exists cosmos_multisend_outputs_address_id
     on cosmos_multisend_outputs (outputs_address_id);
 
-create index cosmos_multisend_message_id
+create index if not exists cosmos_multisend_message_id
     on cosmos_multisend_outputs (message_id);
 
 
 -- /cosmos.slashing.v1beta1.MsgUnjail Table
 
-create table cosmos_unjail_msg
+create table if not exists cosmos_unjail_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
@@ -966,8 +967,8 @@ create table cosmos_unjail_msg
     UNIQUE(tx_id, comment)
 );
 
-create index cosmos_unjail_validator_address_id
+create index if not exists cosmos_unjail_validator_address_id
     on cosmos_unjail_msg (validator_addr_id);
 
-create index cosmos_unjail_tx_id
+create index if not exists cosmos_unjail_tx_id
     on cosmos_unjail_msg (tx_id);
