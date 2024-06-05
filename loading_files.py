@@ -45,6 +45,7 @@ connection = create_connection(db_name, db_user, db_password, db_host, db_port)
 file_path = os.getenv('FILE_PATH')
 file_name = os.getenv('FILE_NAME')
 
+# Set the values that will be loaded to database
 content = check_file(file_path, file_name)
 block_hash = content['block_id']['hash']
 block_hash_hex = block_hash_base64_to_hex(block_hash)
@@ -52,9 +53,9 @@ chain_id = content['block']['header']['chain_id']
 height = content['block']['header']['height']
 tx_num = len(content['block']['data']['txs'])
 created_time = content['block']['header']['time']
-print(block_hash, chain_id, height, tx_num, created_time)
 
 
+# Edit the query that will be loaded to the database
 query = """
 INSERT INTO blocks (block_hash, chain_id, height, tx_num, created_at) VALUES (%s, %s, %s, %s, %s);
 """
