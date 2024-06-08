@@ -112,18 +112,18 @@ files=$(ls $folder_path)
 export txt=$(eval echo $(jq -r '.path.output_path' $info_path))
 if [[ -d $txt ]]; then
     :
-  else
+  els:e
     mkdir $txt
 fi
 
 if [[ -f $txt/output.log ]]; then
-    :
+    rm $txt/output.log #:
   else
     touch $txt/output.log
 fi
 
 if [[ -f $txt/error.log ]]; then
-    :
+    rm $txt/error.log
   else
     touch $txt/error.log
 fi
