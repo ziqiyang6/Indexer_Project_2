@@ -728,3 +728,10 @@ def block_hash_base64_to_hex(hash: str) -> str:
     except Exception as e:
         print(f"Error while hashing: {e}")
         return None
+def ordered(obj):
+    if isinstance(obj, dict):
+        return sorted((k, ordered(v)) for k, v in obj.items())
+    if isinstance(obj, list):
+        return sorted(ordered(x) for x in obj)
+    else:
+        return obj

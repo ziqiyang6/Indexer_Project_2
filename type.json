@@ -26,5 +26,8 @@
     "/cosmos.gov.v1.MsgVote" : "cosmos_vote_msg",
     "/cosmos.gov.v1beta1.MsgVote" : "cosmos_vote_beta1_msg",
     "/cosmos.bank.v1beta1.MsgMultiSend" : "cosmos_multisend_msg",
-        "/cosmos.slashing.v1beta1.MsgUnjail" : "cosmos_unjail_msg"
+        "/cosmos.slashing.v1beta1.MsgUnjail" : "cosmos_unjail_msg",
+        "/ibc.core.channel.v1.MsgChannelOpenInit" : "ibc_core_channel_v1_msgchannelopeninit",
+        "/ibc.core.channel.v1.MsgChannelOpenAck": "ibc_core_channel_v1_msgchannelopenack",
+        "/cosmwasm.wasm.v1.MsgInstantiateContract2": "cosmwasm_msg_instantiate_contract2"
 }   

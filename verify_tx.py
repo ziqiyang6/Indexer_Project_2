@@ -21,8 +21,8 @@ import json
 from functions import check_file
 from functions import create_connection
 from functions import block_hash_base64_to_hex
-from functions import hash_to_hex, decode_tx, compare_nested_json, ordered
-from psycopg2 import errors
+from functions import hash_to_hex, decode_tx, ordered
+from psycopg2 import errors#  compare_nested_json,
 from datetime import datetime, timedelta, timezone
 
 with open("info.json", "r") as f:
@@ -96,15 +96,20 @@ try:
             block_info = trans_values[col]
             
             if col == 'created_at':
-                iso_timestamp = trans_values['created_at'][:26]
+                iso_timestamp = list(trans_values['created_at'])
+                last_char = str(iso_timestamp[25])
+                ##print(iso_timestamp)
+                if int(iso_timestamp[26]) >= 5:
+                    last_char = str(int(iso_timestamp[25]) + 1)
+                iso_timestamp[25] = last_char
+                print(last_char)
+                iso_timestamp = "".join(iso_timestamp)
+                iso_timestamp = iso_timestamp[:26]
                 dt = datetime.strptime(iso_timestamp, "%Y-%m-%dT%H:%M:%S.%f")                
-                dt = dt.replace(tzinfo=timezone.utc).astimezone(
-                    timezone(timedelta(hours=-5))
-                )
-                #dt = dt.replace(microsecond=(dt.microsecond // 10))formatted_dt =  dt.strftime("%Y-%m-%d %H:%M:%S.%f") + "+00:00"
+                formatted_dt =  dt.strftime("%Y-%m-%d %H:%M:%S.%f") + "+00:00"
                 
-                block_info = dt.replace(microsecond = 0)
-                db_info = db_info.replace(microsecond = 0)
+                block_info = formatted_dt #.replace(microsecond=0)dt
+                #db_info = db_info .replace(microsecond=0)
                 
                 #print(created_time) db_infooriginal_timestamp.replace('Z', '').%Z[:-3]
             if col == 'tx_info':

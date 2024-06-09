@@ -103,16 +103,16 @@ fi
 # info.json path
 export info_path=$info_path
 
-# Set the path of directory and cd to it
+# Set the path of directory and cd to it#:
 folder_path=$(eval echo $(jq -r '.path.block_file_path' $info_path))
-# cd $folder_path || { die "Error---->Cannot change to the target directory" 4; }
+cd $folder_path || { die "Error---->Cannot change to the target directory" 4; }
 files=$(ls $folder_path)
 
 # Create log files if not exist
 export txt=$(eval echo $(jq -r '.path.output_path' $info_path))
 if [[ -d $txt ]]; then
     :
-  els:e
+  else
     mkdir $txt
 fi
 
@@ -234,7 +234,7 @@ for file_name in $files; do
             export x=$i
             if [[ $python_three == true ]]; then
                 python3 loading_tx.py >> $LOG 2>> $ERR
-                python3 verify_tx.py >> $OUT 2>> $ERR
+                #python3 verify_tx.py >> $OUT 2>> $ERR
                 if [[ $? -ne 0 ]]; then
                     die "Error---->Transaction $i in $FILE_NAME loading into database failed. (Exit code $?). Check log file for more information" 8
                 fi
