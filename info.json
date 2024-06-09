@@ -1,16 +1,16 @@
 {
     "psql" : {
-        "db_name": "indexer",
-        "db_user": "shikh",
-        "db_password": "",
+        "db_name": "twdb",
+        "db_user": "tw2623",
+        "db_password": "Tabind99",
         "db_host" :"localhost",
         "db_port": "5432"
     },
     "path" : {
-        "output_path": "/Users/shikh/Library/CloudStorage/OneDrive-Personal/Documents/EMR/olaf-indexer/txs_type_report_1",
-        "block_file_path": "/Users/shikh/Library/CloudStorage/OneDrive-Personal/Documents/EMR/olaf-indexer/test_blocks",
-        "script_path": "/Users/shikh/Library/CloudStorage/OneDrive-Personal/Documents/EMR/olaf-indexer",
-        "types_script_path": "/Users/shikh/Library/CloudStorage/OneDrive-Personal/Documents/EMR/olaf-indexer/types_script/",
-        "txt_file_path": "/Users/shikh/Library/CloudStorage/OneDrive-Personal/Documents/EMR/olaf-indexer/types_2.txt"
-    }
+        "output_path": "/home/tw2623/Indexer-Project/report",
+        "block_file_path": "/home/tw2623/Indexer-Project/test_blocks",
+        "script_path": "/home/tw2623/Indexer-Project/",
+        "types_script_path": "/home/tw2623/Indexer-Project/types_script"
+    }    
 }
+

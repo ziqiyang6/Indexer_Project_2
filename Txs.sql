@@ -1018,3 +1018,34 @@ create table if not exists ibc_core_channel_v1_msgchannelopeninit
 );
 create index if not exists ibc_core_channel_v1_msgchannelopeninit_tx_id
     on ibc_core_channel_v1_msgchannelopeninit(tx_id);
+
+
+create table if not exists cosmwasm_msg_instantiate_contract2
+(
+    message_id         uuid default gen_random_uuid() not null
+        primary key,
+    tx_id                           uuid             not null,
+    send_address_id          uuid             not null,
+    admin_address_id    uuid             not null, 
+    tx_type             VARCHAR          not null,
+    code_id             VARCHAR          not null,
+    label               VARCHAR          not null,
+    msg_swap_venues                 VARCHAR          not null,
+    funds               VARCHAR          not null,
+    message_info                    jsonb            not null,
+    comment                         VARCHAR          not null,
+    FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
+    FOREIGN KEY (send_address_id) REFERENCES address(address_id),
+    FOREIGN KEY (admin_address_id) REFERENCES address(address_id),
+    UNIQUE(tx_id, comment)
+
+);
+
+create index if not exists cosmwasm_instantiatecontract2_send_address_id
+    on cosmwasm_instantiatecontract_msg (send_address_id);
+
+create index if not exists cosmwasm_instantiatecontract2_admin_address_id
+    on cosmwasm_instantiatecontract_msg (admin_address_id);
+
+create index if not exists cosmwasm_instantiatecontract2_tx_id
+    on cosmwasm_instantiatecontract_msg (tx_id);
