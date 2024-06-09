@@ -25,6 +25,11 @@
 --- between this type and 'cosmos_vote_msg' is that this table does not   -
 --- have 'metadata' column.
 --- Also, new type 'cosmos_unjail_msg' has been added.                    -
+--- 
+--- Version 1.5 
+--- New types 'ibc_core_channel_v1_msgchannelopenack' and
+--- 'ibc_core_channel_v1_msgchannelopeninit' have been added.             -
+--- Commission_rate is set to accept null values
 ---------------------------------------------------------------------------
 SET client_min_messages TO WARNING;
 
@@ -837,7 +842,7 @@ create table if not exists cosmos_editvalidator_msg
     description_website             VARCHAR          not null,
     description_security_contact    VARCHAR          not null,
     description_details             VARCHAR          not null,
-    commission_rate                 VARCHAR          not null,
+    commission_rate                 VARCHAR          ,
     min_self_delegation             VARCHAR          not null,
     message_info                    jsonb            not null,
     comment                         VARCHAR          not null,
