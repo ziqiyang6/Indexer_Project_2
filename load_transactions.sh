@@ -227,14 +227,14 @@ for file_name in $files; do
         echo "$length transactions were found."
     fi
 
-    # If number of transaction is not zero, we load the info of transaction
+    ## If number of transaction is not zero, we load the info of transaction
     if [[ $length -ne 0 ]]; then
         # For every i less than the length of transaction, make it as the ith transaction in the block
         for ((i = 0; i < $length; i++)); do
             export x=$i
             if [[ $python_three == true ]]; then
                 python3 loading_tx.py >> $LOG 2>> $ERR
-                #python3 verify_tx.py >> $OUT 2>> $ERR
+                python3 verify_tx.py >> $OUT 2>> $ERR #
                 if [[ $? -ne 0 ]]; then
                     die "Error---->Transaction $i in $FILE_NAME loading into database failed. (Exit code $?). Check log file for more information" 8
                 fi
