@@ -135,6 +135,8 @@ try:
                 double_quote_format = double_quote_format.replace('True', 'true')
                 double_quote_format = double_quote_format.replace('"{', "{")
                 double_quote_format = double_quote_format.replace('}"', "}")
+                double_quote_format = double_quote_format.replace("\\", "")
+                print(double_quote_format)
                 block_tx_info = json.loads(trans_values[col])
                 db_tx_info = json.loads(double_quote_format)
                 
