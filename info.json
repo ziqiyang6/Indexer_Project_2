@@ -8,7 +8,7 @@
     },
     "path" : {
         "output_path": "/home/tw2623/Indexer-Project/report",
-        "block_file_path": "/home/tw2623/Indexer-Project/test_blocks2",
+        "block_file_path": "/srv/2024/06/13",
         "script_path": "/home/tw2623/Indexer-Project/",
         "types_script_path": "/home/tw2623/Indexer-Project/types_script"
     }    

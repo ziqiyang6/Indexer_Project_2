@@ -77,7 +77,7 @@ trans_values ={
     'tx_info': json.dumps(decoded_response),
     'comment': f'This is number {order} transaction in BLOCK {height}'
 }
-print(decoded_response)
+#print(decoded_response)
 try:
     query = f"SELECT block_id, tx_hash, chain_id, height, memo, fee_denom, fee_amount, gas_limit, created_at, tx_info, comment FROM transactions WHERE height = %s"
     cursor.execute(query, (height,))
@@ -122,7 +122,7 @@ try:
                     iso_timestamp = iso_timestamp[:26]
                     iso_timestamp = "".join(iso_timestamp)
                     dt = datetime.strptime(iso_timestamp, "%Y-%m-%dT%H:%M:%S.%f")
-                    formatted_dt = dt.strftime("%Y-%m-%d %H:%M:%S.%f") + "00:00"
+                    formatted_dt = dt.strftime("%Y-%m-%d %H:%M:%S.%f") + "+00:00"
                 block_info = formatted_dt
                 
                 
