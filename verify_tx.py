@@ -127,12 +127,14 @@ try:
                 
                 
             if col == 'tx_info':
+                
                 double_quote_format = db_info.replace("'", '"')
                 #
                 double_quote_format = double_quote_format.replace('None', 'null')
                 double_quote_format = double_quote_format.replace('False', 'false')
                 double_quote_format = double_quote_format.replace('True', 'true')
-                print(double_quote_format)
+                double_quote_format = double_quote_format.replace('"{', "{")
+                double_quote_format = double_quote_format.replace('}"', "}")
                 block_tx_info = json.loads(trans_values[col])
                 db_tx_info = json.loads(double_quote_format)
                 
