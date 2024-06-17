@@ -136,12 +136,12 @@ try:
                 double_quote_format = double_quote_format.replace('"{', "{")
                 double_quote_format = double_quote_format.replace('}"', "}")
                 double_quote_format = double_quote_format.replace("\\", "")
-                #$print(double_quote_format)
+                #print(double_quote_format)
                 block_tx_info = json.loads(trans_values[col])
                 db_tx_info = json.loads(double_quote_format)
-                
+                #$#
                 db_info = ordered(db_tx_info)
-                #
+                
                 block_info = ordered(block_tx_info)
             if block_info != db_info:
                 print("error")

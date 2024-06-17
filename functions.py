@@ -730,9 +730,11 @@ def block_hash_base64_to_hex(hash: str) -> str:
         return None
 def ordered(obj):
     if isinstance(obj, dict):
-        return sorted((k, ordered(v)) for k, v in obj.items())
+        return sorted(((k, ordered(v)) for k, v in obj.items()),
+                       key=lambda item: (str(type(item[0])), item[0]))
+
     if isinstance(obj, list):
-        return sorted(ordered(x) for x in obj)
+        return sorted((ordered(x) for x in obj), key=lambda item: (str(type(item)), item))
     else:
         return obj
 def time_parse(time_string):
@@ -763,3 +765,4 @@ def time_parse(time_string):
                 dt = datetime.strptime(time_list, "%Y-%m-%dT%H:%M:%S.%f")
                 formatted_dt = dt.strftime("%Y-%m-%d %H:%M:%S.%f") + "00:00" 
     return formatted_dt      
+
