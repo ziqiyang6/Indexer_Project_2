@@ -21,7 +21,7 @@ import json
 from functions import check_file
 from functions import create_connection
 from functions import block_hash_base64_to_hex
-from functions import hash_to_hex, decode_tx, ordered
+from functions import hash_to_hex, decode_tx, ordered, replace_dict
 from psycopg2 import errors#  compare_nested_json,
 from datetime import datetime, timedelta, timezone
 
@@ -77,7 +77,6 @@ trans_values ={
     'tx_info': json.dumps(decoded_response),
     'comment': f'This is number {order} transaction in BLOCK {height}'
 }
-#print(decoded_response)
 try:
     query = f"SELECT block_id, tx_hash, chain_id, height, memo, fee_denom, fee_amount, gas_limit, created_at, tx_info, comment FROM transactions WHERE height = %s"
     cursor.execute(query, (height,))
@@ -125,27 +124,34 @@ try:
                     formatted_dt = dt.strftime("%Y-%m-%d %H:%M:%S.%f") + "+00:00"
                 block_info = formatted_dt
                 
-                
             if col == 'tx_info':
+                """double_quote_format = db_info.replace("'", '"')
                 
-                double_quote_format = db_info.replace("'", '"')
-                #
                 double_quote_format = double_quote_format.replace('None', 'null')
                 double_quote_format = double_quote_format.replace('False', 'false')
                 double_quote_format = double_quote_format.replace('True', 'true')
                 double_quote_format = double_quote_format.replace('"{', "{")
                 double_quote_format = double_quote_format.replace('}"', "}")
                 double_quote_format = double_quote_format.replace("\\", "")
-                #print(double_quote_format)
+                #   
+                print(double_quote_format) 
                 block_tx_info = json.loads(trans_values[col])
                 db_tx_info = json.loads(double_quote_format)
-                #$#
-                db_info = ordered(db_tx_info)
                 
-                block_info = ordered(block_tx_info)
+                # print(db_tx_info)
+                print(type(row_dict[col]['tx']))"""
+                try:
+                    db_tx_info = json.dumps(row_dict[col])
+                    db_info = json.loads(db_tx_info)
+                    block_info = json.loads(trans_values[col])
+                except json.JSONDecodeError as e:
+                    print("JSONDecodeError:", e)
+                    print(f"Error in block " + file_name)
+
             if block_info != db_info:
-                print("error")
+                ###
                 print(block_info)
+                print("error")
                 print(db_info)
                
              

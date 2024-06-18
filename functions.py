@@ -730,11 +730,24 @@ def block_hash_base64_to_hex(hash: str) -> str:
         return None
 def ordered(obj):
     if isinstance(obj, dict):
-        return sorted(((k, ordered(v)) for k, v in obj.items()),
-                       key=lambda item: (str(type(item[0])), item[0]))
+        return {key: ordered(value) for key, value in sorted(obj.items())}
 
     if isinstance(obj, list):
         return sorted((ordered(x) for x in obj), key=lambda item: (str(type(item)), item))
+    else:
+        return obj
+def replace_dict(obj, old_char, new_char):
+    if isinstance(obj, dict):
+        new_dict = {}
+        for key, value in obj.items():
+            new_key = key.replace(old_char, new_char) if isinstance(key, str) else key
+            new_value = replace_dict(value, old_char, new_char)
+            new_dict[new_key] = new_value
+        return new_dict
+    elif isinstance(obj, list):
+        return [replace_dict(item, old_char, new_char) for item in obj]
+    elif isinstance(obj, str):
+        return obj.replace(old_char, new_char)
     else:
         return obj
 def time_parse(time_string):
