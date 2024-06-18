@@ -34,11 +34,13 @@ To run the whole project, run the command git clone
 ```
 git clone https://github.com/Shikhar-G/Indexer-Project.git
 ```
-**Please open 'info.json' to change the path and input the postgreSQL login information. Do not change the file name or move this file.**
+**Please open 'info.json' to input the postgreSQL login information. Do not change the file name or move this file.**
+
+*For the `db_name` field, ensure this database already exists.*
 
 **This script requires a folder containing decrypted blocks to be parsed.**
 
-Then, run following command:
+Then, from the root directory of the repository, run following command:
 ```
 ./load_transactions.sh -b <block folder location>
 ```
