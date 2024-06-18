@@ -1,16 +1,9 @@
 {
-    "psql" : {
-        "db_name": "twdb",
-        "db_user": "tw2623",
-        "db_password": "Tabind99",
-        "db_host" :"localhost",
-        "db_port": "5432"
-    },
-    "path" : {
-        "output_path": "/home/tw2623/Indexer-Project/report",
-        "block_file_path": "/home/tw2623/Indexer-Project/test_blocks3",
-        "script_path": "/home/tw2623/Indexer-Project/",
-        "types_script_path": "/home/tw2623/Indexer-Project/types_script"
-    }    
+    "psql": {
+        "db_name": "",
+        "db_user": "",
+        "db_password": "",
+        "db_host": "",
+        "db_port": ""
+    }
 }
-
