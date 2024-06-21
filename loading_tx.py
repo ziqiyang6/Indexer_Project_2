@@ -108,6 +108,8 @@ try:
     cursor.execute(query, values)
     tx_id = cursor.fetchone()[0]
 except errors.UniqueViolation as e:
+    error_logger.error(f"Error with loading block info in block " + file_name)
+    error_logger.error(traceback.format_exc())
     connection.rollback()
     search_query = f"SELECT tx_id FROM transactions WHERE block_id = '{block_id}'"
     cursor.execute(search_query)
@@ -153,6 +155,8 @@ for message in decoded_response['tx']['body']['messages']:
     try:
         cursor.execute('INSERT INTO type (type, height) VALUES (%s, %s);', (type, height))
     except errors.UniqueViolation as e:
+        error_logger.error(f"Error with loading block info in block " + file_name)
+        error_logger.error(traceback.format_exc())
         pass
     connection.commit()
 
@@ -171,10 +175,16 @@ for message in decoded_response['tx']['body']['messages']:
         else:
             table.main(tx_id, i, order, type, message)
     except KeyError:
+        error_logger.error(f"Error with loading block info in block " + file_name)
+        error_logger.error(traceback.format_exc())
         print(f'KeyError happened', file=sys.stderr)
     except AttributeError:
+        error_logger.error(f"Error with loading block info in block " + file_name)
+        error_logger.error(traceback.format_exc())
         print(f'Script {table_type} does not have a main function', file=sys.stderr)
     except ImportError:
+        error_logger.error(f"Error with loading block info in block " + file_name)
+        error_logger.error(traceback.format_exc())
         print(f'Script {table_type} could not be found', file=sys.stderr)
     i += 1
 

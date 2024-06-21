@@ -28,7 +28,16 @@ import json
 from functions import check_file
 from functions import create_connection
 from functions import block_hash_base64_to_hex
+import logging
+import traceback
 from psycopg2 import errors
+
+error_logger = logging.getLogger('error')
+error_logger.setLevel(logging.ERROR)
+
+error_handler = logging.FileHandler('error.log')
+error_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+error_logger.addHandler(error_handler)
 
 with open('info.json', 'r') as f:
     info = json.load(f)
@@ -66,6 +75,8 @@ cursor = connection.cursor()
 try:
     cursor.execute(query, values)
 except errors.UniqueViolation as e:
+    error_logger.error(f"Error with loading block info in block " + file_name)
+    error_logger.error(traceback.format_exc())
     pass
 connection.commit()
 cursor.close()
