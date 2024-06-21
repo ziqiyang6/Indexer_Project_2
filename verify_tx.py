@@ -84,6 +84,7 @@ try:
     
     if row is None or len(row) != 1:
         loadedCorrectly = False
+        #print("error")
     else:
         row = row[0]
         colnames =  [desc[0] for desc in cursor.description]
@@ -95,6 +96,9 @@ try:
             block_info = trans_values[col]
             
             if col == 'created_at':
+                #print(block_info)
+                #print(db_info)
+                
                 iso_timestamp = list(trans_values['created_at'])
                 
                 if len(iso_timestamp) == 30:
@@ -125,21 +129,6 @@ try:
                 block_info = formatted_dt
                 
             if col == 'tx_info':
-                """double_quote_format = db_info.replace("'", '"')
-                
-                double_quote_format = double_quote_format.replace('None', 'null')
-                double_quote_format = double_quote_format.replace('False', 'false')
-                double_quote_format = double_quote_format.replace('True', 'true')
-                double_quote_format = double_quote_format.replace('"{', "{")
-                double_quote_format = double_quote_format.replace('}"', "}")
-                double_quote_format = double_quote_format.replace("\\", "")
-                #   
-                print(double_quote_format) 
-                block_tx_info = json.loads(trans_values[col])
-                db_tx_info = json.loads(double_quote_format)
-                
-                # print(db_tx_info)
-                print(type(row_dict[col]['tx']))"""
                 try:
                     db_tx_info = json.dumps(row_dict[col])
                     db_info = json.loads(db_tx_info)

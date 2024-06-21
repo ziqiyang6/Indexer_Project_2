@@ -7,7 +7,7 @@ Programming Language: Python 3.11                                               
                                                                                     *
 Libraries: json    importlib       os                                               *
                                                                                     *
-Creater Name: Ziqi Yang                                                             *
+Creater Name: Ziqi Yang, Thomas Wang                                                *
                                                                                     *
 Published Date: 4/15/2024                                                           *
                                                                                     *
@@ -128,12 +128,15 @@ i = 1
 for message in decoded_response['tx']['body']['messages']:
 
     # Define the type of message to find the corresponding python script
+    
     type = message['@type']
 
     try:
         table_type = type_json[type]
         print(table_type)
     except KeyError:
+        error_logger.error(f"Error with loading block info in block " + file_name)
+        error_logger.error(traceback.format_exc())
         new_type(str(message), output_path, height, order , i)
         continue
 

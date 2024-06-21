@@ -134,9 +134,16 @@ if [[ -f $txt/output2.log ]]; then
     touch $txt/output2.log
 fi
 
+if [[ -f $txt/test.log ]]; then
+    rm $txt/test.log #:
+  else
+    touch $txt/test.log
+fi
+
 # Set the path of log files
 export LOG=$txt/output.log
 export OUT=$txt/output2.log
+export TEST=$txt/test.log
 export ERR=$txt/error.log
 
 # Set the values of psql login info
@@ -235,6 +242,7 @@ for file_name in $files; do
             if [[ $python_three == true ]]; then
                 python3 loading_tx.py >> $LOG 2>> $ERR
                 python3 verify_tx.py >> $OUT 2>> $ERR #
+                python3 test.py >> $TEST 2>> $ERR
                 if [[ $? -ne 0 ]]; then
                     die "Error---->Transaction $i in $FILE_NAME loading into database failed. (Exit code $?). Check log file for more information" 8
                 fi
