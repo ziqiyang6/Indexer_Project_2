@@ -21,7 +21,7 @@ import json
 from functions import check_file
 from functions import create_connection
 from functions import block_hash_base64_to_hex
-from functions import hash_to_hex, decode_tx, ordered, replace_dict
+from functions import hash_to_hex, decode_tx, ordered, replace_dict, time_parse
 from psycopg2 import errors#  compare_nested_json,
 from datetime import datetime, timedelta, timezone
 
@@ -99,33 +99,7 @@ try:
                 #print(block_info)
                 #print(db_info)
                 
-                iso_timestamp = list(trans_values['created_at'])
-                
-                if len(iso_timestamp) == 30:
-                    milisecond_str = ""
-                    microsecond_str = ""
-                    for item in iso_timestamp[20: 26]:
-                        milisecond_str = milisecond_str + item
-                    for item in iso_timestamp[26:-2]:
-                        microsecond_str = microsecond_str + item
-                    rounded_mili = milisecond_str + "." + microsecond_str
-                    print(rounded_mili)
-                    rounded_mili = round(float(rounded_mili))
-                    rounded_mili = str(rounded_mili).zfill(len(milisecond_str))
-                    
-                    
-                    
-                    iso_timestamp = "".join(iso_timestamp[:20])
-                    iso_timestamp = iso_timestamp + rounded_mili
-                    
-                
-                    dt = datetime.strptime(iso_timestamp, "%Y-%m-%dT%H:%M:%S.%f")                
-                    formatted_dt =  dt.strftime("%Y-%m-%d %H:%M:%S.%f") + "+00:00"
-                else:
-                    iso_timestamp = iso_timestamp[:26]
-                    iso_timestamp = "".join(iso_timestamp)
-                    dt = datetime.strptime(iso_timestamp, "%Y-%m-%dT%H:%M:%S.%f")
-                    formatted_dt = dt.strftime("%Y-%m-%d %H:%M:%S.%f") + "+00:00"
+                formatted_dt = time_parse(trans_values[col])
                 block_info = formatted_dt
                 
             if col == 'tx_info':

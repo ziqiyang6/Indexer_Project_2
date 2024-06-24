@@ -27,10 +27,21 @@ KeyError output now can be printed into error log instead of output log         
 
 #    Scripts start below
 from functions import create_connection
+import os
+import sys
 import json
+import logging
+import traceback
 from psycopg2 import errors
 
 def main(tx_id, message_no, transaction_no, tx_type, message, ids):
+
+    error_logger = logging.getLogger('error')
+    error_logger.setLevel(logging.ERROR)
+
+    error_handler = logging.FileHandler('error.log')
+    error_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+    error_logger.addHandler(error_handler)
 
     # import the login info for psql from 'info.json'
     with open('info.json', 'r') as f:
@@ -44,6 +55,8 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
 
     connection = create_connection(db_name, db_user, db_password, db_host, db_port)
     cursor = connection.cursor()
+
+    file_name = os.getenv('FILE_NAME')
     try:
 
 
@@ -88,6 +101,8 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
         connection.commit()
         connection.close()
     except KeyError:
+        error_logger.error(f"Error with loading block info in block " + file_name)
+        error_logger.error(traceback.format_exc())
         print(f'KeyError happens in type {tx_type}', file=sys.stderr)
     except errors.UniqueViolation as e:
         pass

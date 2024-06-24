@@ -42,7 +42,7 @@ from functions import check_file
 from functions import create_connection
 from functions import decode_tx
 from functions import hash_to_hex
-from functions import new_type
+from functions import new_type, clear_error_log
 from pathlib import Path
 from psycopg2 import errors
 
@@ -108,8 +108,6 @@ try:
     cursor.execute(query, values)
     tx_id = cursor.fetchone()[0]
 except errors.UniqueViolation as e:
-    error_logger.error(f"Error with loading block info in block " + file_name)
-    error_logger.error(traceback.format_exc())
     connection.rollback()
     search_query = f"SELECT tx_id FROM transactions WHERE block_id = '{block_id}'"
     cursor.execute(search_query)
@@ -155,8 +153,6 @@ for message in decoded_response['tx']['body']['messages']:
     try:
         cursor.execute('INSERT INTO type (type, height) VALUES (%s, %s);', (type, height))
     except errors.UniqueViolation as e:
-        error_logger.error(f"Error with loading block info in block " + file_name)
-        error_logger.error(traceback.format_exc())
         pass
     connection.commit()
 

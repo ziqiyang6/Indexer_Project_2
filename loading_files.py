@@ -75,8 +75,6 @@ cursor = connection.cursor()
 try:
     cursor.execute(query, values)
 except errors.UniqueViolation as e:
-    error_logger.error(f"Error with loading block info in block " + file_name)
-    error_logger.error(traceback.format_exc())
     pass
 connection.commit()
 cursor.close()

@@ -19,6 +19,7 @@ Version: 1.0                                                                    
 #    Scripts start below
 from functions import create_connection
 import json
+import sys
 from psycopg2 import errors
 import sys
 

@@ -752,6 +752,7 @@ def replace_dict(obj, old_char, new_char):
         return obj
 def time_parse(time_string):
     time_list = list(time_string)
+    #print(time_string)
     if len(time_string) == 30:
         milisecond_str = ""
         microsecond_str = ""
@@ -759,23 +760,23 @@ def time_parse(time_string):
             milisecond_str = milisecond_str + item
             for item in time_list[26:-2]:
                 microsecond_str = microsecond_str + item
-                rounded_mili = milisecond_str + "." + microsecond_str
-                print(rounded_mili)
-                rounded_mili = round(float(rounded_mili))
-                rounded_mili = str(rounded_mili).zfill(len(milisecond_str))
+        rounded_mili = milisecond_str + "." + microsecond_str
+        #print(rounded_mili)
+        rounded_mili = round(float(rounded_mili))
+        rounded_mili = str(rounded_mili).zfill(len(milisecond_str))
                     
                     
                     
-                time_list = "".join(time_list[:20])
-                time_list = time_list + rounded_mili
+        time_list = "".join(time_list[:20])
+        time_list = time_list + rounded_mili
                     
                 
-                dt = datetime.strptime(time_list, "%Y-%m-%dT%H:%M:%S.%f")                
-                formatted_dt =  dt.strftime("%Y-%m-%d %H:%M:%S.%f") + "+00:00"
+        dt = datetime.strptime(time_list, "%Y-%m-%dT%H:%M:%S.%f")                
+        formatted_dt =  dt.strftime("%Y-%m-%d %H:%M:%S.%f") + "+00:00"
     else:
-                time_list = time_list[:26]
-                time_list = "".join(time_list)
-                dt = datetime.strptime(time_list, "%Y-%m-%dT%H:%M:%S.%f")
-                formatted_dt = dt.strftime("%Y-%m-%d %H:%M:%S.%f") + "00:00" 
+        time_list = time_list[:26]
+        time_list = "".join(time_list)
+        dt = datetime.strptime(time_list, "%Y-%m-%dT%H:%M:%S.%f")
+        formatted_dt = dt.strftime("%Y-%m-%d %H:%M:%S.%f") + "00:00" 
     return formatted_dt      
 

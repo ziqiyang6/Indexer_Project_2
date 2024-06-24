@@ -29,6 +29,7 @@ KeyError output now can be printed into error log instead of output log         
 #    Scripts start below
 from functions import create_connection
 import json
+import sys
 from psycopg2 import errors
 
 def main(tx_id, message_no, transaction_no, tx_type, message,  ids):
