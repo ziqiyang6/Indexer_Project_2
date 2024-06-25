@@ -42,7 +42,7 @@ from functions import check_file
 from functions import create_connection
 from functions import decode_tx
 from functions import hash_to_hex
-from functions import new_type, clear_error_log
+from functions import new_type
 from pathlib import Path
 from psycopg2 import errors
 
