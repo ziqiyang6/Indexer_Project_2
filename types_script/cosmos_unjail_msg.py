@@ -22,6 +22,8 @@ Version: 1.0                                                                    
 from functions import create_connection
 import json
 import sys
+import os
+import traceback
 from psycopg2 import errors
 
 def main(tx_id, message_no, transaction_no, tx_type, message,  ids):
@@ -35,7 +37,7 @@ def main(tx_id, message_no, transaction_no, tx_type, message,  ids):
     db_password = info['psql']['db_password']
     db_host = info['psql']['db_host']
     db_port = info['psql']['db_port']
-
+    file_name = os.getenv('FILE_NAME')
     try:
         # Define the values
         connection = create_connection(db_name, db_user, db_password, db_host, db_port)
@@ -55,7 +57,9 @@ def main(tx_id, message_no, transaction_no, tx_type, message,  ids):
         connection.close()
 
     except KeyError:
-        print(f'KeyError happens in type {tx_type}', file=sys.stderr)
+
+        print(f'KeyError happens in type {tx_type} in block {file_name}', file=sys.stderr)
+        print(traceback.format_exc(), file=sys.stderr)
     except errors.UniqueViolation as e:
         pass
 

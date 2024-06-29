@@ -19,9 +19,10 @@ Version: 1.0                                                                    
 #    Scripts start below
 from functions import create_connection
 import json
-import sys
 from psycopg2 import errors
 import sys
+import os
+import traceback
 
 def main(tx_id, message_no, transaction_no, tx_type, message, ids):
 
@@ -37,6 +38,7 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
 
     connection = create_connection(db_name, db_user, db_password, db_host, db_port)
     cursor = connection.cursor()
+    file_name = os.getenv('FILE_NAME')
     try:
         # Define the values
         proposal_id = message['proposal_id']
@@ -57,7 +59,9 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
         connection.close()
 
     except KeyError:
-        print(f'KeyError happens in type {tx_type}', file=sys.stderr)
+
+        print(f'KeyError happens in type {tx_type} in block {file_name}', file=sys.stderr)
+        print(traceback.format_exc(), file=sys.stderr)
     except errors.UniqueViolation as e:
         pass
 

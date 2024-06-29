@@ -30,18 +30,12 @@ from functions import create_connection
 import os
 import sys
 import json
-import logging
 import traceback
 from psycopg2 import errors
 
 def main(tx_id, message_no, transaction_no, tx_type, message, ids):
 
-    error_logger = logging.getLogger('error')
-    error_logger.setLevel(logging.ERROR)
 
-    error_handler = logging.FileHandler('error.log')
-    error_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
-    error_logger.addHandler(error_handler)
 
     # import the login info for psql from 'info.json'
     with open('info.json', 'r') as f:
@@ -74,18 +68,24 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
         # Condition 1: if there is more than two element in authorization, load like this
         if len(message['grant']['authorization']) > 2 :
             # If max tokens is NULL, make it as '', avoiding the error
-            if message['grant']['authorization']['max_tokens'] == None:
-                max_tokens = ''
+            if 'max_tokens' in message['grant']['authorization'].keys():
+                if message['grant']['authorization']['max_tokens'] == None:
+                    max_tokens = ''
+                else:
+                    max_tokens = message['grant']['authorization']['max_tokens']
             else:
-                max_tokens = message['grant']['authorization']['max_tokens']
-            authorization_type = message['grant']['authorization']['authorization_type']
+                max_tokens = ''
+            if 'authorization_type' in message['grant']['authorization'].keys():
+                authorization_type = message['grant']['authorization']['authorization_type']
+            else:
+                authorization_type = ''
             msg = ''
             message_info = json.dumps(message)
             values = (tx_id, tx_type, ids['granter_id'], ids['grantee_id'], authorizationtype, expiration, max_tokens, authorization_type, msg, message_info, comment )
             cursor.execute(query, values)
             message_id = cursor.fetchone()[0]
             # In this condition, more info will be loaded to allow list table
-            for address in message['grant']['authorization']['allow_list']['address']:
+            for address in message['grant']['authorization']['allow_list']:
 
                 cursor.execute('INSERT INTO cosmos_grant_allowlist (message_id, addresses) VALUES (%s, %s); ', (message_id, address))
         # Condition 2: If not , load like this
@@ -101,9 +101,9 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
         connection.commit()
         connection.close()
     except KeyError:
-        error_logger.error(f"Error with loading block info in block " + file_name)
-        error_logger.error(traceback.format_exc())
-        print(f'KeyError happens in type {tx_type}', file=sys.stderr)
+
+        print(f'KeyError happens in type {tx_type} in block {file_name}', file=sys.stderr)
+        print(traceback.format_exc(), file=sys.stderr)
     except errors.UniqueViolation as e:
         pass
 

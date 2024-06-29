@@ -1,3 +1,5 @@
+
+
 #    Scripts start below
 from functions import create_connection
 import json
@@ -21,38 +23,31 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
     connection = create_connection(db_name, db_user, db_password, db_host, db_port)
     cursor = connection.cursor()
     file_name = os.getenv('FILE_NAME')
+
     try:
         # Edit the query that will be loaded to the database
         query = """
-                INSERT INTO cosmwasm_msg_instantiate_contract2 (tx_id, tx_type, send_address_id, admin_address_id, code_id, label, msg_swap_venues,funds, message_info, comment) 
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+                INSERT INTO cosmwasm_migratecontract_msg (tx_id, tx_type, send_address_id, contracts, code_id, msg, message_info, comment) 
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s);
                 """
-
-        # Define the values
-        sender = ids['sender_id']
-        admin = ids['admin_id']
-        if(sender != ids['sender_id']):
-            sender = message['sender']#s
-        if(admin != ids['admin_id']):
-            admin = message['admin']
-        code_id = message['code_id']
-        label = message['label']
-        msg = list(message['msg'])
-        funds = message['funds']
-        message = json.dumps(message)
+        contract = message['contract']
+        message_info = json.dumps(message)
         comment = f'This is number {message_no} message in number {transaction_no} transaction '
 
-
-        values = (tx_id, tx_type, sender, admin, code_id, label, msg,funds, message,comment)
+        code_id = message['code_id']
+        msg = list(message['msg']['with_update'])
+        #public_keys_info = [{"type": pk["@type"], "key": pk["key"]} for pk in data["signer_infos"][0]["public_key"]["public_keys"]]
+        #public_keys = [pk["key"] for pk in ["signer_infos"][0]["public_key"]["public_keys"]]
+        #signer_infos = message['auth_info']['signer_infos']['public_key']
+        values = (tx_id, tx_type, ids['sender_id'], contract, code_id, msg, message_info, comment)
         cursor.execute(query, values)
 
         connection.commit()
         connection.close()
-
     except KeyError:
 
         print(f'KeyError happens in type {tx_type} in block {file_name}', file=sys.stderr)
-        print(traceback.format_exec(), file=sys.stderr)
+        print(traceback.format_exc(), file=sys.stderr)
     except errors.UniqueViolation as e:
         pass
 

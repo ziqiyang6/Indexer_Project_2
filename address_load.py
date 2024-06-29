@@ -23,10 +23,13 @@ changed to only three condition, 'user', 'validator', and 'contract'.           
 from functions import create_connection
 from datetime import datetime
 import json
+import os
 from psycopg2 import errors
 import sys
 
 def main(address):
+
+    
 
     with open('info.json', 'r') as f:
         info = json.load(f)
@@ -40,6 +43,7 @@ def main(address):
     connection = create_connection(db_name, db_user, db_password, db_host, db_port)
     cursor = connection.cursor()
 
+    file_name = os.getenv('FILE_NAME')
     # Define the values
     comment = ''
     created_time = datetime.now()
@@ -63,7 +67,7 @@ def main(address):
     # If the address does not belong to three types above, it will be an unknown type
     else:
         address_type = 'Unknown'
-        print("The type of address could not be detected, check address", file=sys.stderr)
+        print(f"The type of address could not be detected, check address " + address + " in block " + file_name, file=sys.stderr)
 
     query = """
     INSERT INTO address (address_type, addresses, comment, created_at, updated_at) VALUES (%s, %s, %s, %s, %s)

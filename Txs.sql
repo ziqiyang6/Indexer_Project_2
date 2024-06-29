@@ -565,6 +565,10 @@ create index if not exists cosmwasm_executecontract_send_address_id
 create index if not exists cosmwasm_executecontract_tx_id
     on cosmwasm_executecontract_msg (tx_id);
 
+create index if not exists cosmwasm_executecontract_msg_contracts
+    on cosmwasm_executecontract_msg (contracts);
+
+
 -- cosmwasm_wasm_v1_MsgInstantiateContract table
 
 create table if not exists cosmwasm_instantiatecontract_msg
@@ -1049,3 +1053,30 @@ create index if not exists cosmwasm_instantiatecontract2_admin_address_id
 
 create index if not exists cosmwasm_instantiatecontract2_tx_id
     on cosmwasm_instantiatecontract_msg (tx_id);
+
+create table if not exists cosmwasm_migratecontract_msg
+(
+    message_id         uuid default gen_random_uuid() not null
+        primary key,
+    tx_id                           uuid             not null,
+    send_address_id          uuid             not null,
+    tx_type             VARCHAR          not null,
+    contracts           VARCHAR          not null,
+    code_id             VARCHAR          not null,
+    msg                 VARCHAR          not null,
+    message_info                    jsonb            not null,
+    comment                         VARCHAR          not null,
+    FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
+    FOREIGN KEY (send_address_id) REFERENCES address(address_id),
+    UNIQUE(tx_id, comment)
+
+);
+
+create index if not exists cosmwasm_migratecontract_send_address_id
+    on cosmwasm_executecontract_msg (send_address_id);
+
+create index if not exists cosmwasm_migratecontract_tx_id
+    on cosmwasm_executecontract_msg (tx_id);
+
+create index if not exists cosmwasm_migratecontract_contracts
+    on cosmwasm_migratecontract_msg(contracts);

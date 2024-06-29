@@ -23,11 +23,12 @@ import json
 from psycopg2 import errors
 import sys
 import os
+import traceback
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
 sys.path.append(parent_dir)
 import address_load
-
+file_name = os.getenv('FILE_NAME')
 
 def main(tx_id, message_no, transaction_no, tx_type, message):
 
@@ -97,7 +98,10 @@ def main(tx_id, message_no, transaction_no, tx_type, message):
         connection.close()
 
     except KeyError:
-        print(f'KeyError happens in type {tx_type}', file=sys.stderr)
+
+        print(f'KeyError happens in type {tx_type} in block {file_name}', file=sys.stderr)
+        print(traceback.format_exc(), file=sys.stderr)
+
     except errors.UniqueViolation as e:
         pass
 

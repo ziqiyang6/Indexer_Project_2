@@ -36,8 +36,7 @@ import json
 import importlib
 import address_load
 import os
-import logging
-import traceback
+
 from functions import check_file
 from functions import create_connection
 from functions import decode_tx
@@ -45,13 +44,8 @@ from functions import hash_to_hex
 from functions import new_type
 from pathlib import Path
 from psycopg2 import errors
+import traceback
 
-error_logger = logging.getLogger('error')
-error_logger.setLevel(logging.ERROR)
-
-error_handler = logging.FileHandler('error.log')
-error_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
-error_logger.addHandler(error_handler)
 
 # import the login info for psql from 'info.json'
 with open('info.json', 'r') as f:
@@ -94,8 +88,8 @@ try:
     comment = f'This is number {order} transaction in BLOCK {height}'
     tx_info = json.dumps(decoded_response)
 except Exception as e:
-    error_logger.error(f"Error with loading block info in block " + file_name)
-    error_logger.error(traceback.format_exc())
+    print(traceback.format_exc(), file=sys.stderr)
+    print(f"Error with loading block info in block " + file_name, file=sys.stderr)
     raise
 
 # Edit the query that will be loaded to the database
@@ -135,8 +129,9 @@ for message in decoded_response['tx']['body']['messages']:
         table_type = type_json[type]
         print(table_type)
     except KeyError:
-        error_logger.error(f"Error with loading block info in block " + file_name)
-        error_logger.error(traceback.format_exc())
+        
+        print(f"Error with loading block info in block " + file_name, file=sys.stderr)
+        print(traceback.format_exc(), file=sys.stderr)
         new_type(str(message), output_path, height, order , i)
         continue
 
@@ -171,17 +166,11 @@ for message in decoded_response['tx']['body']['messages']:
         else:
             table.main(tx_id, i, order, type, message)
     except KeyError:
-        error_logger.error(f"Error with loading block info in block " + file_name)
-        error_logger.error(traceback.format_exc())
-        print(f'KeyError happened', file=sys.stderr)
+        print(f'KeyError happened in block {file_name}', file=sys.stderr)
     except AttributeError:
-        error_logger.error(f"Error with loading block info in block " + file_name)
-        error_logger.error(traceback.format_exc())
-        print(f'Script {table_type} does not have a main function', file=sys.stderr)
+        print(f'Script {table_type} does not have a main function, error caused in block {file_name}', file=sys.stderr)
     except ImportError:
-        error_logger.error(f"Error with loading block info in block " + file_name)
-        error_logger.error(traceback.format_exc())
-        print(f'Script {table_type} could not be found', file=sys.stderr)
+        print(f'Script {table_type} could not be found, error caused in block {file_name}', file=sys.stderr)
     i += 1
 
 cursor.close()

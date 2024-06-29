@@ -28,16 +28,9 @@ import json
 from functions import check_file
 from functions import create_connection
 from functions import block_hash_base64_to_hex
-import logging
-import traceback
 from psycopg2 import errors
 
-error_logger = logging.getLogger('error')
-error_logger.setLevel(logging.ERROR)
 
-error_handler = logging.FileHandler('error.log')
-error_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
-error_logger.addHandler(error_handler)
 
 with open('info.json', 'r') as f:
     info = json.load(f)
@@ -55,15 +48,17 @@ file_path = os.getenv('FILE_PATH')
 file_name = os.getenv('FILE_NAME')
 
 # Set the values that will be loaded to database
-content = check_file(file_path, file_name)
-block_hash = content['block_id']['hash']
-block_hash_hex = block_hash_base64_to_hex(block_hash)
-chain_id = content['block']['header']['chain_id']
-height = content['block']['header']['height']
-tx_num = len(content['block']['data']['txs'])
-created_time = content['block']['header']['time']
-
-
+try:
+    content = check_file(file_path, file_name)
+    block_hash = content['block_id']['hash']
+    block_hash_hex = block_hash_base64_to_hex(block_hash)
+    chain_id = content['block']['header']['chain_id']
+    height = content['block']['header']['height']
+    tx_num = len(content['block']['data']['txs'])
+    created_time = content['block']['header']['time']
+except Exception as e:
+    print(f"Error with loading block info in block " + file_name, file=sys.stderr)
+    raise
 # Edit the query that will be loaded to the database
 query = """
 INSERT INTO blocks (block_hash, chain_id, height, tx_num, created_at) VALUES (%s, %s, %s, %s, %s);
