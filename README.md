@@ -34,23 +34,27 @@ To run the whole project, run the command git clone
 ```
 git clone https://github.com/Shikhar-G/Indexer-Project.git
 ```
-**Please open 'info.json' to change the path and postgreSQL login information.**
+**Please open 'info.json' to input the postgreSQL login information. Do not change the file name or move this file.**
 
-Then, run following command:
+*For the `db_name` field, ensure this database already exists.*
+
+**This script requires a folder containing decrypted blocks to be parsed.**
+
+Then, from the root directory of the repository, run following command:
 ```
-./load_transactions.sh -c <info.json location>
+./load_transactions.sh -b <block folder location>
 ```
 or if using the `python3` command, run:
 ```
-./load_transactions.sh -c <info.json location> -t
+./load_transactions.sh -b <block folder location> -t
 ```
 if the command above does not work, run the following:
 ```
-bash load_transactions.sh -c <info.json location>
+bash load_transactions.sh -b <block folder location>
 ```
 or 
 ```
-bash load_transactions.sh -c <info.json location> -t
+bash load_transactions.sh -b <block folder location> -t
 ```
 # ERD
 [ERD for indexer](ERD.pdf)
