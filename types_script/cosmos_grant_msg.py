@@ -101,9 +101,9 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
         connection.commit()
         connection.close()
     except KeyError:
+        print(traceback.format_exc(), file=sys.stderr)
 
         print(f'KeyError happens in type {tx_type} in block {file_name}', file=sys.stderr)
-        print(traceback.format_exc(), file=sys.stderr)
     except errors.UniqueViolation as e:
         pass
 

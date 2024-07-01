@@ -28,7 +28,7 @@ from psycopg2 import errors
 import sys
 
 def main(address):
-
+    #print(address, sys.stderr)
     
 
     with open('info.json', 'r') as f:
@@ -54,6 +54,7 @@ def main(address):
     # Count the length after 1
     substring_after_1 = address[index_of_1 + 1:]
     length_after_1 = len(substring_after_1)
+    #print(length_after_1, file=sys.stderr)
     # If the string contains 'valoper' string, this is a validator address
     validator = 'valoper'
     if validator in address:
@@ -64,10 +65,12 @@ def main(address):
     # If the length after 1 equals 38, this is a user address
     elif length_after_1 == 38:
         address_type = 'user'
+    elif len(address) == 0:
+        address_type = 'blank'
     # If the address does not belong to three types above, it will be an unknown type
     else:
         address_type = 'Unknown'
-        print(f"The type of address could not be detected, check address " + address + " in block " + file_name, file=sys.stderr)
+        print(f"The type of address could not be detected, check address" + address + " in block " + file_name, file=sys.stderr)
 
     query = """
     INSERT INTO address (address_type, addresses, comment, created_at, updated_at) VALUES (%s, %s, %s, %s, %s)

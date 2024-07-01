@@ -141,6 +141,7 @@ for message in decoded_response['tx']['body']['messages']:
         if 'send' in key or 'receiver' in key or 'addr' in key or 'grante' in key or 'admin' in key or 'voter' in key:
             # Define the address value and run the address_load script to load address
             address = message[key]
+            print(address, file=sys.stderr)
             ids[f'{key}_id'] = address_load.main(address)
 
 
