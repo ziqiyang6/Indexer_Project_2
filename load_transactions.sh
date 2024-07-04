@@ -187,11 +187,18 @@ DBPASSWORD=$(jq -r '.psql.db_password' $info_path)
 DBHOST=$(jq -r '.psql.db_host' $info_path)
 DBPORT=$(jq -r '.psql.db_port' $info_path)
 
+echo "Database Name: $DBNAME"
+echo "Database User: $DBUSER"
+echo "Database Password: $DBPASSWORD"
+echo "Database Host: $DBHOST"
+echo "Database Port: $DBPORT"
+
 # export txt_file_path=$(eval echo $(jq -r '.path.txt_file_path' $info_path))
 
 # cd $(eval echo $(jq -r '.path.script_path' $info_path))
 
 # Connect to psql
+
 PGPASSWORD=$DBPASSWORD psql -d $DBNAME -U $DBUSER -h localhost -f Txs.sql --quiet --set ON_ERROR_STOP=1
 
 if [[ $? -ne 0 ]]; then

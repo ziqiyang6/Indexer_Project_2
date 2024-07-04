@@ -43,6 +43,7 @@ import hashlib
 import base64
 import binascii
 from datetime import datetime
+import traceback
 
 def check_file(file_path,file_name):
 
@@ -74,6 +75,10 @@ def check_file(file_path,file_name):
 
     except json.JSONDecodeError:
         print(f"{file_name} is not a JSON file.", file=sys.stderr)
+        file = open(file_path, "r")
+        print(file)
+        checkLine(file_path, file_name,len(file.readlines()) - 1)
+        file.close()
         sys.exit(3)
 
     except ValueError as e:
@@ -627,7 +632,7 @@ def Validate_json(content, file_name):
     except ValidationError as ve:
         print(f"JSON data of {file_name} is invalid.", file=sys.stderr)
         print(ve, file=sys.stderr)
-
+        print(traceback.format_exc())
 
 def new_type(message, file_path, height, transaction_num, message_num):
 
@@ -728,28 +733,39 @@ def block_hash_base64_to_hex(hash: str) -> str:
     except Exception as e:
         print(f"Error while hashing: {e}")
         return None
-def ordered(obj):
-    if isinstance(obj, dict):
-        return {key: ordered(value) for key, value in sorted(obj.items())}
-
-    if isinstance(obj, list):
-        return sorted((ordered(x) for x in obj), key=lambda item: (str(type(item)), item))
-    else:
-        return obj
-def replace_dict(obj, old_char, new_char):
-    if isinstance(obj, dict):
-        new_dict = {}
-        for key, value in obj.items():
-            new_key = key.replace(old_char, new_char) if isinstance(key, str) else key
-            new_value = replace_dict(value, old_char, new_char)
-            new_dict[new_key] = new_value
-        return new_dict
-    elif isinstance(obj, list):
-        return [replace_dict(item, old_char, new_char) for item in obj]
-    elif isinstance(obj, str):
-        return obj.replace(old_char, new_char)
-    else:
-        return obj
+def checkLine(file_path, file_name, N):
+       try:
+            print("ran", file=sys.stderr)
+            with open(file_path, 'r') as fr:
+                # reading line by line
+                lines = fr.readlines()
+                if(N >= len(lines) or N == 0):
+                    print(f"Error: Line number does not exist", file=sys.stderr)
+                else:
+                    if lines[N - 1].strip() != '':
+                        foundError = N
+                    else:
+                        foundError = -1
+                    # pointer for position
+                    ptr = 1
+                
+                    # opening in writing mode
+                    if foundError != -1:
+                        with open(file_path, 'w') as fw:
+                            for line in lines:
+                            
+                                # we want to remove 5th line
+                                if ptr != foundError:
+                                    fw.write(line)
+                                ptr += 1
+                        print(foundError, sys.stderr)
+            print("Deleted", file=sys.stderr)
+            
+            check_file(file_path, file_name)
+       except:
+            print("Oops! something error", sys.stderr)
+            print(traceback.format_exc())
+    
 def time_parse(time_string):
     time_list = list(time_string)
     #print(time_string)

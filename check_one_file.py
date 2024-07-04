@@ -26,7 +26,7 @@ import sys
 import json
 from functions import check_file
 from functions import height_check
-from functions import Validate_json
+from functions import Validate_json, checkLine
 from functions import new_type
 from functions import decode_tx
 
@@ -50,4 +50,25 @@ if Validate_json(result, file_name) == 1:
     else:
         sys.exit(0)
 else:
-   sys.exit(8)
+    foundError = checkLine(file_name, 1)
+    if(foundError >= 0):
+       try:
+            with open(file_name, 'r') as fr:
+                # reading line by line
+                lines = fr.readlines()
+                
+                # pointer for position
+                ptr = 1
+            
+                # opening in writing mode
+                with open(file_name, 'w') as fw:
+                    for line in lines:
+                    
+                        # we want to remove 5th line
+                        if ptr != foundError:
+                            fw.write(line)
+                        ptr += 1
+            print("Deleted", file=sys.stderr)
+       except:
+            print("Oops! something error")
+    sys.exit(8)

@@ -8,14 +8,14 @@ def scan_file(filename, dirname):
     
     
 
-    if("Error with loading block info" in filename):
+    if("KeyError happened in block" in filename):
         contains = True
     else:
         with open(os.path.join(dirname,filename)) as f:
             lines = f.readlines()
             for l in lines:
                 #print(l)
-                if("Error with loading block info" in l):
+                if("KeyError happened in block" in l):
                     contains = True
                     print(l)
                     break

@@ -1080,3 +1080,83 @@ create index if not exists cosmwasm_migratecontract_tx_id
 
 create index if not exists cosmwasm_migratecontract_contracts
     on cosmwasm_migratecontract_msg(contracts);
+
+
+create table if not exists ibc_openconnectiontry_msg
+(
+    message_id         uuid default gen_random_uuid() not null
+        primary key,
+    tx_id                           uuid             not null,    
+    tx_type                         VARCHAR          not null,
+    client_id                    VARCHAR          not null,
+    previous_connection_id                     VARCHAR          not null,
+    counterparty_client_id                  VARCHAR          not null,
+    counterparty_connection_id                VARCHAR          not null,
+    counterparty_versions_identifier            VARCHAR          not null,
+    counterparty_versions_features              VARCHAR         not null,
+    proof_init                                  VARCHAR         not null,
+    proof_height_revision_number    VARCHAR          not null,
+    proof_height_revision_height    VARCHAR          not null,
+    signer                          VARCHAR          not null,
+    message_info                    jsonb            not null,
+    comment                         VARCHAR          not null,
+    FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
+    UNIQUE(tx_id, comment)
+);
+
+create index if not exists ibc_openconnectiontry_msg_tx_id
+    on ibc_openconnectiontry_msg(tx_id);
+
+create index if not exists ibc_openconnectiontry_msg_proof_height
+    on ibc_openconnectiontry_msg(proof_height_revision_height);
+
+
+
+
+
+create table if not exists ibc_openconnectionconfirm_msg
+(
+    message_id         uuid default gen_random_uuid() not null
+        primary key,
+    tx_id                           uuid             not null,    
+    tx_type                         VARCHAR          not null,
+    connection_id                   VARCHAR          not null,
+    proof_height_revision_number    VARCHAR          not null,
+    proof_height_revision_height    VARCHAR          not null,
+    signer                          VARCHAR          not null,
+    message_info                    jsonb            not null,
+    comment                         VARCHAR          not null,
+    FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
+    UNIQUE(tx_id, comment)
+);
+
+create index if not exists ibc_openconnectionconfirm_msg_tx_id
+    on ibc_openconnectionconfirm_msg(tx_id);
+
+create index if not exists ibc_openconnectionconfirm_msg_proof_height
+    on ibc_openconnectionconfirm_msg(proof_height_revision_height);
+
+create table if not exists ibc_createclient_msg
+(
+    message_id         uuid default gen_random_uuid() not null
+        primary key,
+    tx_id                           uuid             not null,    
+    tx_type                         VARCHAR          not null,
+    client_type                     VARCHAR          not null,
+    client_chain_id                 VARCHAR          not null,
+    client_trust_level_num          VARCHAR          not null,
+    client_trust_level_denom        VARCHAR          not null,
+    latest_height_revision_num      VARCHAR          not null,
+    latest_height_revision_height   VARCHAR          not null,
+    frozen_height_revision_number   VARCHAR          not null,
+    frozen_height_revision_height   VARCHAR          not null,
+    signer                          VARCHAR          not null,
+    message_info                    jsonb            not null,
+    comment                         VARCHAR          not null,
+    FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
+    UNIQUE(tx_id, comment)
+);
+
+
+create index if not exists ibc_createclient_msg_tx_id
+    on ibc_createclient_msg(tx_id);

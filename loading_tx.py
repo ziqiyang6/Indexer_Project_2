@@ -88,8 +88,9 @@ try:
     comment = f'This is number {order} transaction in BLOCK {height}'
     tx_info = json.dumps(decoded_response)
 except Exception as e:
-    print(traceback.format_exc(), file=sys.stderr)
+    
     print(f"Error with loading block info in block " + file_name, file=sys.stderr)
+    print(traceback.format_exc(), file=sys.stderr)
     raise
 
 # Edit the query that will be loaded to the database
@@ -141,7 +142,6 @@ for message in decoded_response['tx']['body']['messages']:
         if 'send' in key or 'receiver' in key or 'addr' in key or 'grante' in key or 'admin' in key or 'voter' in key:
             # Define the address value and run the address_load script to load address
             address = message[key]
-            print(address, file=sys.stderr)
             ids[f'{key}_id'] = address_load.main(address)
 
 
@@ -154,7 +154,7 @@ for message in decoded_response['tx']['body']['messages']:
 
     try:
         # Go to the diectory that contains the scripts
-        module_path = Path(info['path']['types_script_path'])
+        module_path = Path("/home/tw2623/Indexer-Project/types_script")
         expanded_script_path = os.path.expanduser(module_path)
         sys.path.append(expanded_script_path)
 
@@ -168,6 +168,7 @@ for message in decoded_response['tx']['body']['messages']:
             table.main(tx_id, i, order, type, message)
     except KeyError:
         print(f'KeyError happened in block {file_name}', file=sys.stderr)
+        print(traceback.format_exc(), file=sys.stderr)
     except AttributeError:
         print(f'Script {table_type} does not have a main function, error caused in block {file_name}', file=sys.stderr)
     except ImportError:
