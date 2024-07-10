@@ -64,6 +64,7 @@ cursor = connection.cursor()
 file_path = os.getenv('FILE_PATH')
 file_name = os.getenv('FILE_NAME')
 output_path = os.getenv('txt')
+cwd = os.getcwd()
 
 # Set the values that will be loaded to database
 content = check_file(file_path, file_name)
@@ -154,7 +155,7 @@ for message in decoded_response['tx']['body']['messages']:
 
     try:
         # Go to the diectory that contains the scripts
-        module_path = Path("/home/tw2623/Indexer-Project/types_script")
+        module_path = Path(f"{cwd}/types_script")
         expanded_script_path = os.path.expanduser(module_path)
         sys.path.append(expanded_script_path)
 

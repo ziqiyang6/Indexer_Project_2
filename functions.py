@@ -790,9 +790,9 @@ def time_parse(time_string):
         dt = datetime.strptime(time_list, "%Y-%m-%dT%H:%M:%S.%f")                
         formatted_dt =  dt.strftime("%Y-%m-%d %H:%M:%S.%f") + "+00:00"
     else:
-        time_list = time_list[:26]
-        time_list = "".join(time_list)
-        dt = datetime.strptime(time_list, "%Y-%m-%dT%H:%M:%S.%f")
-        formatted_dt = dt.strftime("%Y-%m-%d %H:%M:%S.%f") + "00:00" 
+        parsed_time_string = time_string.replace("Z", "")
+        dt = datetime.strptime(parsed_time_string, "%Y-%m-%dT%H:%M:%S.%f")
+        formatted_dt =  dt.strftime("%Y-%m-%d %H:%M:%S.%f") + "+00:00"
+
     return formatted_dt      
 

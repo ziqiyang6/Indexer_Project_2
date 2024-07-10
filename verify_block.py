@@ -4,7 +4,7 @@ import sys
 import json
 from functions import check_file
 from functions import create_connection
-from functions import block_hash_base64_to_hex
+from functions import block_hash_base64_to_hex, time_parse
 from psycopg2 import errors
 from datetime import datetime, timedelta, timezone
 
@@ -80,15 +80,11 @@ try:
                 file=sys.stderr,
             )
         sys.exit(1)
-
-    timestamp_truncated = created_time[:26] + "Z"
-    # set time zone to -5
-    created_time = datetime.strptime(timestamp_truncated, "%Y-%m-%dT%H:%M:%S.%fZ")
-    created_time = created_time.replace(tzinfo=timezone.utc).astimezone(
-        timezone(timedelta(hours=-5))
-    )
+    print(created_time, file=sys.stderr)
+    print(len(created_time), file=sys.stderr)
+    created_time = time_parse(created_time)
     # check that the created time is correct to the second, ignore the milliseconds
-    if result[4].replace(microsecond=0) != created_time.replace(microsecond=0):
+    if str(result[4]) != created_time:
         print(
             "Created time is not correct, found",
             result[4],
@@ -96,6 +92,8 @@ try:
             created_time,
             file=sys.stderr,
         )
+        print(result[4])
+        print(type(result[4]), file=sys.stderr)
         sys.exit(1)
 
 except errors.UniqueViolation as e:

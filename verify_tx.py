@@ -77,7 +77,6 @@ trans_values ={
     'tx_info': json.dumps(decoded_response),
     'comment': f'This is number {order} transaction in BLOCK {height}'
 }
-
 try:
     query = f"SELECT block_id, tx_hash, chain_id, height, memo, fee_denom, fee_amount, gas_limit, created_at, tx_info, comment FROM transactions WHERE height = %s"
     cursor.execute(query, (height,))
@@ -99,7 +98,7 @@ try:
             if col == 'created_at':
                 #print(block_info)
                 #print(db_info)
-                
+                print(len(trans_values))
                 formatted_dt = time_parse(trans_values[col])
                 block_info = formatted_dt
                 
