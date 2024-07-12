@@ -42,7 +42,7 @@ from psycopg2 import OperationalError
 import hashlib
 import base64
 import binascii
-from datetime import datetime
+from datetime import datetime, timezone
 import traceback
 
 def check_file(file_path,file_name):
@@ -765,8 +765,16 @@ def checkLine(file_path, file_name, N):
        except:
             print("Oops! something error", sys.stderr)
             print(traceback.format_exc())
-    
+
+
 def time_parse(time_string):
+    timestamp_truncated = time_string[:26]
+    created_time = datetime.strptime(timestamp_truncated, "%Y-%m-%dT%H:%M:%S.%f").replace(tzinfo=timezone.utc).replace(microsecond=0)
+    return created_time
+
+
+    
+def time_parse_old(time_string):
     time_list = list(time_string)
     #print(time_string)
     if len(time_string) == 30:

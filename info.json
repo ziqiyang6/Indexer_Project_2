@@ -1,13 +1,9 @@
 {
     "psql": {
-        "db_name": "twdb",
-        "db_user": "tw2623",
+        "db_name": "",
+        "db_user": "",
         "db_password": "",
         "db_host": "",
         "db_port": ""
-    },
-    "path":
-    {
-        "type_script_path": "/home/tw2623/Indexer-Project/types_script"
     }
 }

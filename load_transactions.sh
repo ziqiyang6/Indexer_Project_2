@@ -187,11 +187,11 @@ DBPASSWORD=$(jq -r '.psql.db_password' $info_path)
 DBHOST=$(jq -r '.psql.db_host' $info_path)
 DBPORT=$(jq -r '.psql.db_port' $info_path)
 
-echo "Database Name: $DBNAME"
-echo "Database User: $DBUSER"
-echo "Database Password: $DBPASSWORD"
-echo "Database Host: $DBHOST"
-echo "Database Port: $DBPORT"
+# echo "Database Name: $DBNAME"
+# echo "Database User: $DBUSER"
+# echo "Database Password: $DBPASSWORD"
+# echo "Database Host: $DBHOST"
+# echo "Database Port: $DBPORT"
 
 # export txt_file_path=$(eval echo $(jq -r '.path.txt_file_path' $info_path))
 
@@ -282,8 +282,7 @@ for file_name in $files; do
             export x=$i
             if [[ $python_three == true ]]; then
                 python3 loading_tx.py >> $LOG 2>> $ERR
-                python3 verify_tx.py >> $OUT 2>> $ERR #
-                python3 test.py >> $TEST 2>> $ERR
+                python3 verify_tx.py >> $OUT 2>> $ERR
                 if [[ $? -ne 0 ]]; then
                     die "Error---->Transaction $i in $FILE_NAME loading into database failed. (Exit code $?). Check log file for more information" 8
                 fi
