@@ -98,7 +98,6 @@ try:
             if col == 'created_at':
                 #print(block_info)
                 #print(db_info)
-                print(len(trans_values))
                 formatted_dt = time_parse(trans_values[col])
                 block_info = formatted_dt
                 
