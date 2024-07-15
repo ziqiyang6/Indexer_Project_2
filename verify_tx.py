@@ -78,12 +78,16 @@ trans_values ={
     'comment': f'This is number {order} transaction in BLOCK {height}'
 }
 try:
-    query = f"SELECT block_id, tx_hash, chain_id, height, memo, fee_denom, fee_amount, gas_limit, created_at, tx_info, comment FROM transactions WHERE height = %s"
-    cursor.execute(query, (height,))
+    query = f"SELECT block_id, tx_hash, chain_id, height, memo, fee_denom, fee_amount, gas_limit, created_at, tx_info, comment FROM transactions WHERE height = %s AND tx_hash = %s"
+    cursor.execute(query, (height, tx_hash))
     row = cursor.fetchall()
     
-    if row is None or len(row) != 1:
-        loadedCorrectly = False
+    if row is None:
+
+        print(row, file=sys.stderr)
+        print("There should be only one row in block " + file_name + " at transaction " + num + ", found", len(row), "rows", file=sys.stderr)
+        cursor.close()
+        sys.exit(1)
         #print("error")
     else:
         row = row[0]
@@ -98,8 +102,10 @@ try:
             if col == 'created_at':
                 #print(block_info)
                 #print(db_info)
+                # print(len(trans_values))
                 formatted_dt = time_parse(trans_values[col])
                 block_info = formatted_dt
+                db_info = row_dict[col].astimezone(timezone.utc).replace(microsecond=0)
                 
             if col == 'tx_info':
                 try:
@@ -109,13 +115,17 @@ try:
                 except json.JSONDecodeError as e:
                     print("JSONDecodeError:", e)
                     print(f"Error in block " + file_name)
+                    cursor.close()
+                    sys.exit(1)
 
             if block_info != db_info:
-                ###
-                #print(block_info)
-                print("error")
-                #print(db_info)
-               
-             
+               print(
+                    f"Error in block " + file_name + " at transaction " + num + " in column " + col + " found\n",
+                    "Expected: " + str(block_info) + "\n",
+                    "Found: " + str(db_info) + "\n", file=sys.stderr
+                )
+               cursor.close()
+               sys.exit(1)
+
 except errors.UniqueViolation as e:
     pass

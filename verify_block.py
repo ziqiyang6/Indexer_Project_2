@@ -46,6 +46,7 @@ values = (block_hash_hex,)
 try:
     cursor.execute(query, values)
     result = cursor.fetchall()
+    cursor.close()
     # check there should only be one row
     if result is None or len(result) != 1:
         # print to stderr
@@ -80,31 +81,20 @@ try:
                 file=sys.stderr,
             )
         sys.exit(1)
-    
-    if len(created_time) == 30:
-        timestamp_truncated = created_time[:26] + "Z"
-        # set time zone to -5
-        created_time = datetime.strptime(timestamp_truncated, "%Y-%m-%dT%H:%M:%S.%fZ")
-        created_time = created_time.replace(tzinfo=timezone.utc).astimezone(
-            timezone(timedelta(hours=-5))
-        )
-    else:
-        created_time = datetime.strptime(created_time, "%Y-%m-%dT%H:%M:%S.%fZ")
-        created_time = created_time.replace(tzinfo=timezone.utc).astimezone(
-            timezone(timedelta(hours=-5))
-        )
-    print(created_time, file=sys.stderr)
+    # print(created_time, file=sys.stderr)
+    # print(len(created_time), file=sys.stderr)
+    created_time = time_parse(created_time)
+    # convert the database time to utc
+    database_time = result[4].astimezone(timezone.utc).replace(microsecond=0)
     # check that the created time is correct to the second, ignore the milliseconds
-    if result[4].replace(microsecond=0) != created_time.replace(microsecond=0):
+    if created_time != database_time:
         print(
             "Created time is not correct, found",
-            result[4],
+            database_time,
             "expected",
             created_time,
             file=sys.stderr,
         )
-        print(result[4])
-        print(type(result[4]), file=sys.stderr)
         sys.exit(1)
 
 except errors.UniqueViolation as e:

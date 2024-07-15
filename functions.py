@@ -42,7 +42,7 @@ from psycopg2 import OperationalError
 import hashlib
 import base64
 import binascii
-from datetime import datetime
+from datetime import datetime, timezone
 import traceback
 
 def check_file(file_path,file_name):
@@ -109,8 +109,6 @@ def height_check(content,file_name):
 
     # print(f'{file_name} is a valid JSON file and the name is same as the BLOCK HEIGHT'
     return height
-
-
 
 
 def Validate_json(content, file_name):
@@ -654,10 +652,6 @@ def new_type(message, file_path, height, transaction_num, message_num):
             file.write(message + '\n' + '\n')
 
 
-
-
-
-
 def decode_tx(tx, max_retries=3, retry_delay=2):
     """
     Decodes a transaction using an external API.
@@ -765,8 +759,19 @@ def checkLine(file_path, file_name, N):
        except:
             print("Oops! something error", sys.stderr)
             print(traceback.format_exc())
-    
+
+
 def time_parse(time_string):
+    timestamp_truncated = time_string[:19] # ignore the milliseconds
+    created_time = (
+        datetime.strptime(timestamp_truncated, "%Y-%m-%dT%H:%M:%S")
+        .replace(tzinfo=timezone.utc)
+        .replace(microsecond=0)
+    )
+    return created_time
+
+
+def time_parse_old(time_string):
     time_list = list(time_string)
     #print(time_string)
     if len(time_string) == 30:
@@ -795,4 +800,3 @@ def time_parse(time_string):
         formatted_dt =  dt.strftime("%Y-%m-%d %H:%M:%S.%f") + "+00:00"
 
     return formatted_dt      
-

@@ -34,7 +34,7 @@ To run the whole project, run the command git clone
 ```
 git clone https://github.com/Shikhar-G/Indexer-Project.git
 ```
-**Please open 'info.json' to input the postgreSQL login information. Do not change the file name or move this file.**
+**Please open 'info.json.template', copy this file to a new file called 'info.json', and input the postgreSQL login information. Do not input any personal information into info.json.template.**
 
 *For the `db_name` field, ensure this database already exists.*
 
