@@ -46,6 +46,7 @@ values = (block_hash_hex,)
 try:
     cursor.execute(query, values)
     result = cursor.fetchall()
+    cursor.close()
     # check there should only be one row
     if result is None or len(result) != 1:
         # print to stderr
@@ -80,20 +81,20 @@ try:
                 file=sys.stderr,
             )
         sys.exit(1)
-    print(created_time, file=sys.stderr)
-    print(len(created_time), file=sys.stderr)
+    # print(created_time, file=sys.stderr)
+    # print(len(created_time), file=sys.stderr)
     created_time = time_parse(created_time)
+    # convert the database time to utc
+    database_time = result[4].astimezone(timezone.utc).replace(microsecond=0)
     # check that the created time is correct to the second, ignore the milliseconds
-    if str(result[4]) != created_time:
+    if created_time != database_time:
         print(
             "Created time is not correct, found",
-            result[4],
+            database_time,
             "expected",
             created_time,
             file=sys.stderr,
         )
-        print(result[4])
-        print(type(result[4]), file=sys.stderr)
         sys.exit(1)
 
 except errors.UniqueViolation as e:
