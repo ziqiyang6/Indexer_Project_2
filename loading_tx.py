@@ -73,6 +73,7 @@ num = os.getenv('x')
 try:
     transaction_string = content['block']['data']['txs'][int(num)]
     decoded_response = decode_tx(transaction_string)
+
     tx_hash = hash_to_hex(transaction_string)
     chain_id = content['block']['header']['chain_id']
     height = content['block']['header']['height']
@@ -81,8 +82,14 @@ try:
     result = cursor.fetchall()
     block_id = result[0][0]
     memo = decoded_response['tx']['body']['memo']
-    fee_denom = decoded_response['tx']['auth_info']['fee']['amount'][0]['denom']
-    fee_amount = decoded_response['tx']['auth_info']['fee']['amount'][0]['amount']
+
+    if len(decoded_response['tx']['auth_info']['fee']['amount']) != 0:
+        print("run")
+        fee_denom = decoded_response['tx']['auth_info']['fee']['amount'][0]['denom']
+        fee_amount = decoded_response['tx']['auth_info']['fee']['amount'][0]['amount']
+    else:
+        fee_denom = ""
+        fee_amount = 0
     gas_limit = decoded_response['tx']['auth_info']['fee']['gas_limit']
     created_time = content['block']['header']['time']
     order = int(num) + 1

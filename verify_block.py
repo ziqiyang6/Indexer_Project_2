@@ -51,7 +51,7 @@ try:
     if result is None or len(result) != 1:
         # print to stderr
         print("There should be only one row", file=sys.stderr)
-        sys.exit(1)
+
     result = result[0]
 
     # check the block information is correct
@@ -80,7 +80,6 @@ try:
                 tx_num,
                 file=sys.stderr,
             )
-        sys.exit(1)
     # print(created_time, file=sys.stderr)
     # print(len(created_time), file=sys.stderr)
     created_time = time_parse(created_time)
@@ -95,7 +94,7 @@ try:
             created_time,
             file=sys.stderr,
         )
-        sys.exit(1)
+
 
 except errors.UniqueViolation as e:
     pass

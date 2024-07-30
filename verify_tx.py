@@ -64,19 +64,29 @@ search_query = f"SELECT block_id FROM blocks WHERE height = '{height}'" # Search
 cursor.execute(search_query)
 result = cursor.fetchall()
 ##########block_id =
-trans_values ={
+
+if(len(decoded_response['tx']['auth_info']['fee']['amount']) != 0):
+        fee_denom = decoded_response['tx']['auth_info']['fee']['amount'][0]['denom']
+        fee_amount = decoded_response['tx']['auth_info']['fee']['amount'][0]['amount']
+else:
+        fee_denom = "0"
+        fee_amount = "0"  
+        
+
+trans_values = {
     'block_id': result[0][0],
     'tx_hash': hash_to_hex(transaction_string),
     'chain_id':  content["block"]["header"]["chain_id"],
     'height':  content["block"]["header"]["height"],
     'memo':  decoded_response['tx']['body']['memo'],
-    'fee_denom': decoded_response['tx']['auth_info']['fee']['amount'][0]['denom'],
-    'fee_amount': decoded_response['tx']['auth_info']['fee']['amount'][0]['amount'],
+    'fee_denom':fee_denom,
+    'fee_amount': fee_amount,
     'gas_limit': decoded_response['tx']['auth_info']['fee']['gas_limit'],
     'created_at': content['block']['header']['time'],
     'tx_info': json.dumps(decoded_response),
     'comment': f'This is number {order} transaction in BLOCK {height}'
 }
+
 try:
     query = f"SELECT block_id, tx_hash, chain_id, height, memo, fee_denom, fee_amount, gas_limit, created_at, tx_info, comment FROM transactions WHERE height = %s AND tx_hash = %s"
     cursor.execute(query, (height, tx_hash))
@@ -87,7 +97,6 @@ try:
         print(row, file=sys.stderr)
         print("There should be only one row in block " + file_name + " at transaction " + num + ", found", len(row), "rows", file=sys.stderr)
         cursor.close()
-        sys.exit(1)
         #print("error")
     else:
         row = row[0]
@@ -116,7 +125,8 @@ try:
                     print("JSONDecodeError:", e)
                     print(f"Error in block " + file_name)
                     cursor.close()
-                    sys.exit(1)
+
+
 
             if block_info != db_info:
                print(
@@ -125,7 +135,6 @@ try:
                     "Found: " + str(db_info) + "\n", file=sys.stderr
                 )
                cursor.close()
-               sys.exit(1)
 
 except errors.UniqueViolation as e:
     pass
