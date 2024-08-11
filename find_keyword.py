@@ -8,14 +8,14 @@ def scan_file(filename, dirname):
     
     
 
-    if("KeyError happened in block" in filename):
+    if("is successfully loaded into the database" in filename):
         contains = True
     else:
         with open(os.path.join(dirname,filename)) as f:
             lines = f.readlines()
             for l in lines:
                 #print(l)
-                if("KeyError happened in block" in l):
+                if("is successfully loaded into the database" in l):
                     contains = True
                     print(l)
                     break

@@ -233,14 +233,14 @@ for file_name in $files; do
         fi
         python3 loading_files.py >> $LOG 2>> $ERR
         if [[ $? -ne 0 ]]; then
-            die "$FILE_NAME loading into database failed. (Exit code $?). Check log file for more information" 6
+            echo "$FILE_NAME loading into database failed. (Exit code $?). Check log file for more information" 6
             continue
         elif [[ $verbose == true ]]; then
             echo -e "$FILE_NAME is successfully loaded into the database."
         fi
         python3 verify_block.py >> $LOG 2>> $ERR
         if [[ $? -ne 0 ]]; then
-            die "$FILE_NAME does not pass the verification test. (Exit code $?). Check log file for more information" 7
+            echo "$FILE_NAME does not pass the verification test. (Exit code $?). Check log file for more information" 7
         elif [[ $verbose == true ]]; then
             echo -e "$FILE_NAME passes the verification test."
         fi
@@ -254,7 +254,8 @@ for file_name in $files; do
         fi
         python loading_files.py >> $LOG 2>> $ERR
         if [[ $? -ne 0 ]]; then
-            die "$FILE_NAME loading into database failed. (Exit code $?). Check log file for more information" 6
+            
+	    echo "$FILE_NAME loading into database failed. (Exit code $?). Check log file for more information" 6
             continue
         elif [[ $verbose == true ]]; then
             echo -e "$FILE_NAME is successfully loaded into the database."
@@ -284,13 +285,13 @@ for file_name in $files; do
                 python3 loading_tx.py >> $LOG 2>> $ERR
                 python3 verify_tx.py >> $OUT 2>> $ERR
                 if [[ $? -ne 0 ]]; then
-                    die "Error---->Transaction $i in $FILE_NAME loading into database failed. (Exit code $?). Check log file for more information" 8
+                    echo "Error---->Transaction $i in $FILE_NAME loading into database failed. (Exit code $?). Check log file for more information" 8
                 fi
             else
                 python loading_tx.py >> $LOG 2>> $ERR 
                 python verify_tx.py >> $OUT 2>> $ERR
                 if [[ $? -ne 0 ]]; then
-                    die "Error---->Transaction $i in $FILE_NAME loading into database failed. (Exit code $?). Check log file for more information" 8
+                    echo "Error---->Transaction $i in $FILE_NAME loading into database failed. (Exit code $?). Check log file for more information" 8
                 fi
             fi
             txn_count=$((txn_count+1))

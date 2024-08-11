@@ -86,7 +86,7 @@ trans_values = {
     'tx_info': json.dumps(decoded_response),
     'comment': f'This is number {order} transaction in BLOCK {height}'
 }
-
+print(decoded_response)
 try:
     query = f"SELECT block_id, tx_hash, chain_id, height, memo, fee_denom, fee_amount, gas_limit, created_at, tx_info, comment FROM transactions WHERE height = %s AND tx_hash = %s"
     cursor.execute(query, (height, tx_hash))
@@ -97,6 +97,7 @@ try:
         print(row, file=sys.stderr)
         print("There should be only one row in block " + file_name + " at transaction " + num + ", found", len(row), "rows", file=sys.stderr)
         cursor.close()
+        #break
         #print("error")
     else:
         row = row[0]

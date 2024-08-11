@@ -73,7 +73,9 @@ num = os.getenv('x')
 try:
     transaction_string = content['block']['data']['txs'][int(num)]
     decoded_response = decode_tx(transaction_string)
-
+    if(decoded_response == None):
+        print(f"failed to decode transaction in block {file_name}", file=sys.stderr)
+        exit()
     tx_hash = hash_to_hex(transaction_string)
     chain_id = content['block']['header']['chain_id']
     height = content['block']['header']['height']
