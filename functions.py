@@ -30,8 +30,10 @@ Function 'new_type' has been created to store new message type if there is      
 **********************************************************************************'''
 
 #    Functions start below
+import importlib
 import json
 import os
+from pathlib import Path
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 import sys
@@ -44,8 +46,11 @@ import base64
 import binascii
 from datetime import datetime, timezone
 import traceback
-#//from terra_sdk.client.lcd import LCDClient
-#from terra_sdk.core.tx import Tx #?/ trmintimport
+from psycopg2 import errors
+
+
+# //from terra_sdk.client.lcd import LCDClient
+# from terra_sdk.core.tx import Tx #?/ trmintimport
 
 def check_file(file_path,file_name):
 
@@ -54,20 +59,19 @@ def check_file(file_path,file_name):
         pass
         # print(f'{file_name} does exist in {path_name}')
     else:
-        print(f'{file_name} does exist in {file_path}, or {file_name} is not a file', file=sys.stderr)
+        print(
+            f"{file_name} does not exist in {file_path}, or {file_name} is not a file",
+            file=sys.stderr,
+        )
         sys.exit(1)
-
-
 
         # Check if the file name is composed entirely of digits
     if file_name.isdigit():
         pass
-            #print('This file is named by numbers')
+        # print('This file is named by numbers')
     else:
         print(f"The file name {file_name} is not composed entirely of digits.", file=sys.stderr)
         sys.exit(2)
-
-
 
     # Check if it is a JSON file
     try:
@@ -113,7 +117,7 @@ def height_check(content,file_name):
     return height
 
 
-def Validate_json(content, file_name):
+def validate_json(content, file_name):
     schema = {
             "type": "object",
             "properties":{
@@ -627,12 +631,13 @@ def Validate_json(content, file_name):
 
     try:
         validate(instance=content, schema=schema)
-        #print(f'Content in {file_name} has been validated')
+        # print(f'Content in {file_name} has been validated')
         return 1
     except ValidationError as ve:
         print(f"JSON data of {file_name} is invalid.", file=sys.stderr)
         print(ve, file=sys.stderr)
         print(traceback.format_exc())
+
 
 def new_type(message, file_path, height, transaction_num, message_num):
 
@@ -703,10 +708,364 @@ def create_connection(db_name, db_user, db_password, db_host, db_port):
             host=db_host,
             port=db_port,
         )
-        #print("Connection to PostgreSQL DB successful")#
+        # print("Connection to PostgreSQL DB successful")#
     except OperationalError as e:
         print(f"The error '{e}' occurred")
     return connection
+
+
+def load_block(connection, file_path, file_name):
+    try:
+        content = check_file(file_path, file_name)
+        block_hash = content["block_id"]["hash"]
+        block_hash_hex = block_hash_base64_to_hex(block_hash)
+        chain_id = content["block"]["header"]["chain_id"]
+        height = content["block"]["header"]["height"]
+        tx_num = len(content["block"]["data"]["txs"])
+        created_time = content["block"]["header"]["time"]
+    except Exception as e:
+        print(f"Error with loading block info in block " + file_name, file=sys.stderr)
+        raise
+    # Edit the query that will be loaded to the database
+    query = """
+    INSERT INTO blocks (block_hash, chain_id, height, tx_num, created_at) VALUES (%s, %s, %s, %s, %s);
+    """
+
+    values = (block_hash_hex, chain_id, height, tx_num, created_time)
+
+    cursor = connection.cursor()
+    try:
+        cursor.execute(query, values)
+    except errors.UniqueViolation as e:
+        pass
+    connection.commit()
+    cursor.close()
+
+
+def verify_block(connection, file_path, file_name):
+    content = check_file(file_path, file_name)
+    block_hash = content["block_id"]["hash"]
+    block_hash_hex = block_hash_base64_to_hex(block_hash)
+    chain_id = content["block"]["header"]["chain_id"]
+    height = content["block"]["header"]["height"]
+    tx_num = str(len(content["block"]["data"]["txs"]))
+    created_time = content["block"]["header"]["time"]
+
+    cursor = connection.cursor()
+
+    # check block information was inserted into database correctly
+    # get the block hash, chain id, height, tx number, and created time from database
+    query = """
+    SELECT block_hash, chain_id, height, tx_num, created_at FROM blocks WHERE block_hash = %s;
+    """
+
+    values = (block_hash_hex,)
+
+    try:
+        cursor.execute(query, values)
+        result = cursor.fetchall()
+        cursor.close()
+        # check there should only be one row
+        if result is None or len(result) != 1:
+            # print to stderr
+            print("There should be only one row", file=sys.stderr)
+
+        result = result[0]
+
+        # check the block information is correct
+        if result[1] != chain_id or result[2] != height or result[3] != tx_num:
+            if result[1] != chain_id:
+                print(
+                    "Chain id is not correct, found",
+                    result[1],
+                    "expected",
+                    chain_id,
+                    file=sys.stderr,
+                )
+            if result[2] != height:
+                print(
+                    "Height is not correct, found",
+                    result[2],
+                    "expected",
+                    height,
+                    file=sys.stderr,
+                )
+            if result[3] != tx_num:
+                print(
+                    "Tx number is not correct, found",
+                    result[3],
+                    "expected",
+                    tx_num,
+                    file=sys.stderr,
+                )
+        # print(created_time, file=sys.stderr)
+        # print(len(created_time), file=sys.stderr)
+        created_time = time_parse(created_time)
+        # convert the database time to utc
+        database_time = result[4].astimezone(timezone.utc).replace(microsecond=0)
+        # check that the created time is correct to the second, ignore the milliseconds
+        if created_time != database_time:
+            print(
+                "Created time is not correct, found",
+                database_time,
+                "expected",
+                created_time,
+                file=sys.stderr,
+            )
+
+    except errors.UniqueViolation as e:
+        pass
+    cursor.close()
+
+
+def is_valid_file(file_path, file_name):
+    result = check_file(file_path, file_name)
+
+    # Check if this file passes JSON Schema test. 1 is the specific case that passes.
+    if validate_json(result, file_name) == 1:
+        return True, result
+    else:
+        foundError = checkLine(file_name, 1)
+        if foundError >= 0:
+            try:
+                with open(file_name, "r") as fr:
+                    # reading line by line
+                    lines = fr.readlines()
+
+                    # pointer for position
+                    ptr = 1
+
+                    # opening in writing mode
+                    with open(file_name, "w") as fw:
+                        for line in lines:
+
+                            # we want to remove 5th line
+                            if ptr != foundError:
+                                fw.write(line)
+                            ptr += 1
+                print("Deleted", file=sys.stderr)
+            except:
+                print("Error in file", file=sys.stderr)
+        return False, None
+
+
+def get_num_txs(content):
+    count = len(content["block"]["data"]["txs"])
+    return count
+
+
+def address_load(connection, address, file_name):
+    cursor = connection.cursor()
+    # Define the values
+    comment = ""
+    created_time = datetime.now()
+    updated_time = created_time
+
+    # Find the index of number 1 in the string
+    index_of_1 = address.find("1")
+    # Count the length after 1
+    substring_after_1 = address[index_of_1 + 1 :]
+    length_after_1 = len(substring_after_1)
+    # print(length_after_1, file=sys.stderr)
+    # If the string contains 'valoper' string, this is a validator address
+    validator = "valoper"
+    if validator in address:
+        address_type = "validator"
+    # If the length larger than 38, this is a contract address
+    elif length_after_1 >= 38:
+        address_type = "contract"
+    # If the length after 1 equals 38, this is a user address
+    elif length_after_1 == 38:
+        address_type = "user"
+    elif len(address) == 0:
+        address_type = "blank"
+    # If the address does not belong to three types above, it will be an unknown type
+    else:
+        address_type = "Unknown"
+        print(
+            f"The type of address could not be detected, check address"
+            + address
+            + " in block "
+            + file_name,
+            file=sys.stderr,
+        )
+
+    query = """
+    INSERT INTO address (address_type, addresses, comment, created_at, updated_at) VALUES (%s, %s, %s, %s, %s)
+    RETURNING address_id;
+    
+    """
+
+    # Load the values
+    values = (address_type, address, comment, created_time, updated_time)
+    try:
+        cursor.execute(query, values)
+        address_id = cursor.fetchone()[0]
+
+    except errors.UniqueViolation as e:
+        connection.rollback()
+        search_query = f"SELECT address_id FROM address WHERE addresses = '{address}'"
+        cursor.execute(search_query)
+        address_id = cursor.fetchone()[0]
+
+    connection.commit()
+    return address_id
+
+
+def load_tx(connection, file_path, file_name, num):
+    cursor = connection.cursor()
+
+    # Set the path of file
+    output_path = os.getenv("txt")
+    cwd = os.getcwd()
+
+    # Set the values that will be loaded to database
+    content = check_file(file_path, file_name)
+    # decoded_response = decode_tx(content['block']['data']['txs'][int(num)])
+    try:
+        transaction_string = content["block"]["data"]["txs"][int(num)]
+        decoded_response = decode_tx(transaction_string)
+        if decoded_response == None:
+            print(f"failed to decode transaction in block {file_name}", file=sys.stderr)
+            exit()
+        tx_hash = hash_to_hex(transaction_string)
+        chain_id = content["block"]["header"]["chain_id"]
+        height = content["block"]["header"]["height"]
+        search_query = f"SELECT block_id FROM blocks WHERE height = '{height}'"  # Search the block hash from the block
+        cursor.execute(search_query)
+        result = cursor.fetchall()
+        block_id = result[0][0]
+        memo = decoded_response["tx"]["body"]["memo"]
+
+        if len(decoded_response["tx"]["auth_info"]["fee"]["amount"]) != 0:
+            print("run")
+            fee_denom = decoded_response["tx"]["auth_info"]["fee"]["amount"][0]["denom"]
+            fee_amount = decoded_response["tx"]["auth_info"]["fee"]["amount"][0][
+                "amount"
+            ]
+        else:
+            fee_denom = ""
+            fee_amount = 0
+        gas_limit = decoded_response["tx"]["auth_info"]["fee"]["gas_limit"]
+        created_time = content["block"]["header"]["time"]
+        order = int(num) + 1
+        comment = f"This is number {order} transaction in BLOCK {height}"
+        tx_info = json.dumps(decoded_response)
+    except Exception as e:
+
+        print(f"Error with loading block info in block " + file_name, file=sys.stderr)
+        print(traceback.format_exc(), file=sys.stderr)
+        raise
+
+    # Edit the query that will be loaded to the database
+    query = """
+    INSERT INTO transactions (block_id, tx_hash, chain_id, height, memo, fee_denom, fee_amount, gas_limit, created_at, tx_info, comment) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING tx_id;
+    """
+    values = (
+        block_id,
+        tx_hash,
+        chain_id,
+        height,
+        memo,
+        fee_denom,
+        fee_amount,
+        gas_limit,
+        created_time,
+        tx_info,
+        comment,
+    )
+
+    try:
+        cursor.execute(query, values)
+        tx_id = cursor.fetchone()[0]
+    except errors.UniqueViolation as e:
+        connection.rollback()
+        search_query = f"SELECT tx_id FROM transactions WHERE block_id = '{block_id}'"
+        cursor.execute(search_query)
+        tx_id = cursor.fetchone()[0]
+
+    connection.commit()
+
+    # Message loading
+    # Read the type.json file
+    with open("type.json", "r") as f:
+        type_json = json.load(f)
+
+    # Use FOR LOOP to load every message in the transaction
+    i = 1
+    for message in decoded_response["tx"]["body"]["messages"]:
+
+        # Define the type of message to find the corresponding python script
+
+        type = message["@type"]
+
+        try:
+            table_type = type_json[type]
+            print(table_type)
+        except KeyError:
+
+            print(
+                f"Error with loading block info in block " + file_name, file=sys.stderr
+            )
+            print(traceback.format_exc(), file=sys.stderr)
+            new_type(str(message), output_path, height, order, i)
+            continue
+
+        ids = {}
+        for key in message:
+            # Use keywords to catch address keys
+            if (
+                "send" in key
+                or "receiver" in key
+                or "addr" in key
+                or "grante" in key
+                or "admin" in key
+                or "voter" in key
+            ):
+                # Define the address value and run the address_load script to load address
+                address = message[key]
+                ids[f"{key}_id"] = address_load(connection, address, file_name)
+
+        # Load the type and height to type table
+        try:
+            cursor.execute(
+                "INSERT INTO type (type, height) VALUES (%s, %s);", (type, height)
+            )
+        except errors.UniqueViolation as e:
+            connection.rollback()
+        connection.commit()
+
+        try:
+            # Go to the diectory that contains the scripts
+            module_path = Path(f"{cwd}/types_script")
+            expanded_script_path = os.path.expanduser(module_path)
+            sys.path.append(expanded_script_path)
+
+            # Import the corresponding script
+            table = importlib.import_module(table_type)
+            # If the message contains the address, address_id will be added
+            if len(ids) > 0:
+                table.main(connection, file_name, tx_id, i, order, type, message, ids)
+            # If not, address_id will not
+            else:
+                table.main(connection, file_name, tx_id, i, order, type, message)
+        except KeyError:
+            print(f"KeyError happened in block {file_name}", file=sys.stderr)
+            print(traceback.format_exc(), file=sys.stderr)
+        except AttributeError:
+            print(
+                f"Script {table_type} does not have a main function, error caused in block {file_name}",
+                file=sys.stderr,
+            )
+        except ImportError:
+            print(
+                f"Script {table_type} could not be found, error caused in block {file_name}",
+                file=sys.stderr,
+            )
+        i += 1
+
+    cursor.close()
+
 
 def hash_to_hex(data: str) -> str:
     try:
