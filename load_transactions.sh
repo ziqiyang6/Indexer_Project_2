@@ -137,6 +137,11 @@ fi
 # info.json path
 export info_path=$info_path
 
+# Get block files from the folder
+# folder_path=$(eval echo $(jq -r '.path.block_file_path' $info_path))
+# cd $folder_path || { die "Error---->Cannot change to the target directory" 4; }
+files=$(ls $folder_path)
+
 # Create log files if not exist
 # export txt=$(eval echo $(jq -r '.path.output_path' $info_path))
 # if [[ -d $txt ]]; then
@@ -203,9 +208,6 @@ if [[ $verbose == true ]]; then
     echo "Txs.sql has been executed."
 fi
 
-export BLOCK_PATH=$folder_path
-
-
 # Select the files in the folder path and run python script 4
 num_blocks=$(ls $folder_path | wc -l)
 bar_size=40
@@ -213,7 +215,10 @@ bar_char_done="#"
 bar_char_todo="-"
 bar_percentage_scale=2
 
+export BLOCK_PATH="${folder_path}"
+
 if [[ $python_three == true ]]; then
+    # get the return value of the python script
     python3 load.py
 else
     python load.py
@@ -226,52 +231,52 @@ for file_name in $files; do
     fi
     export FILE_PATH="${folder_path}${file_name}"
     export FILE_NAME="${file_name}"
-#     # if python_three is true, run python3
-#     if [[ $python_three == true ]]; then
-#         python3 check_one_file.py >> $LOG 2>> $ERR
-#         # Error code 8 means the block does not pass the validation
-#         if [[ $? == 8 ]]; then
-#             die "$FILE_NAME does not pass the JSON validation. (Exit code $?). Check log file for more information" 5
-#         elif [[ $verbose == true ]]; then
-#             echo -e "$FILE_NAME passes the JSON validation."
-#         fi
-#         python3 loading_files.py >> $LOG 2>> $ERR
-#         if [[ $? -ne 0 ]]; then
-#             echo "$FILE_NAME loading into database failed. (Exit code $?). Check log file for more information" 6
-#             continue
-#         elif [[ $verbose == true ]]; then
-#             echo -e "$FILE_NAME is successfully loaded into the database."
-#         fi
-#         python3 verify_block.py >> $LOG 2>> $ERR
-#         if [[ $? -ne 0 ]]; then
-#             echo "$FILE_NAME does not pass the verification test. (Exit code $?). Check log file for more information" 7
-#         elif [[ $verbose == true ]]; then
-#             echo -e "$FILE_NAME passes the verification test."
-#         fi
-#         block_count=$((block_count+1))
-#     else
-#         python check_one_file.py >> $LOG 2>> $ERR
-#         if [[ $? == 8 ]]; then
-#             die "$FILE_NAME does not pass the JSON validation. (Exit code $?). Check log file for more information" 5
-#         elif [[ $verbose == true ]]; then
-#             echo -e "$FILE_NAME passes the JSON validation."
-#         fi
-#         python loading_files.py >> $LOG 2>> $ERR
-#         if [[ $? -ne 0 ]]; then
+    # # if python_three is true, run python3
+    # if [[ $python_three == true ]]; then
+    #     python3 check_one_file.py >> $LOG 2>> $ERR
+    #     # Error code 8 means the block does not pass the validation
+    #     if [[ $? == 8 ]]; then
+    #         die "$FILE_NAME does not pass the JSON validation. (Exit code $?). Check log file for more information" 5
+    #     elif [[ $verbose == true ]]; then
+    #         echo -e "$FILE_NAME passes the JSON validation."
+    #     fi
+    #     python3 loading_files.py >> $LOG 2>> $ERR
+    #     if [[ $? -ne 0 ]]; then
+    #         echo "$FILE_NAME loading into database failed. (Exit code $?). Check log file for more information" 6
+    #         continue
+    #     elif [[ $verbose == true ]]; then
+    #         echo -e "$FILE_NAME is successfully loaded into the database."
+    #     fi
+    #     python3 verify_block.py >> $LOG 2>> $ERR
+    #     if [[ $? -ne 0 ]]; then
+    #         echo "$FILE_NAME does not pass the verification test. (Exit code $?). Check log file for more information" 7
+    #     elif [[ $verbose == true ]]; then
+    #         echo -e "$FILE_NAME passes the verification test."
+    #     fi
+    #     block_count=$((block_count+1))
+    # else
+    #     python check_one_file.py >> $LOG 2>> $ERR
+    #     if [[ $? == 8 ]]; then
+    #         die "$FILE_NAME does not pass the JSON validation. (Exit code $?). Check log file for more information" 5
+    #     elif [[ $verbose == true ]]; then
+    #         echo -e "$FILE_NAME passes the JSON validation."
+    #     fi
+    #     python loading_files.py >> $LOG 2>> $ERR
+    #     if [[ $? -ne 0 ]]; then
             
-# 	    echo "$FILE_NAME loading into database failed. (Exit code $?). Check log file for more information" 6
-#             continue
-#         elif [[ $verbose == true ]]; then
-#             echo -e "$FILE_NAME is successfully loaded into the database."
-#         fi
-#         python verify_block.py >> $LOG 2>> $ERR
-#         if [[ $? -ne 0 ]]; then
-#             die "$FILE_NAME does not pass the verification test. (Exit code $?). Check log file for more information" 7
-#         elif [[ $verbose == true ]]; then
-#             echo -e "$FILE_NAME passes the verification test."
-#         fi
-#         block_count=$((block_count+1))
-#     fi
+	#     echo "$FILE_NAME loading into database failed. (Exit code $?). Check log file for more information" 6
+    #         continue
+    #     elif [[ $verbose == true ]]; then
+    #         echo -e "$FILE_NAME is successfully loaded into the database."
+    #     fi
+    #     python verify_block.py >> $LOG 2>> $ERR
+    #     if [[ $? -ne 0 ]]; then
+    #         die "$FILE_NAME does not pass the verification test. (Exit code $?). Check log file for more information" 7
+    #     elif [[ $verbose == true ]]; then
+    #         echo -e "$FILE_NAME passes the verification test."
+    #     fi
+    #     block_count=$((block_count+1))
+    # fi
 
 
     # Define the length of transaction
