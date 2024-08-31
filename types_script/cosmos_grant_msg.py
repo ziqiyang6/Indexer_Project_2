@@ -26,33 +26,20 @@ KeyError output now can be printed into error log instead of output log         
 **********************************************************************************'''
 
 #    Scripts start below
-from functions import create_connection
 import os
 import sys
 import json
 import traceback
 from psycopg2 import errors
 
-def main(tx_id, message_no, transaction_no, tx_type, message, ids):
 
+def main(
+    connection, file_name, tx_id, message_no, transaction_no, tx_type, message, ids
+):
 
-
-    # import the login info for psql from 'info.json'
-    with open('info.json', 'r') as f:
-        info = json.load(f)
-
-    db_name = info['psql']['db_name']
-    db_user = info['psql']['db_user']
-    db_password = info['psql']['db_password']
-    db_host = info['psql']['db_host']
-    db_port = info['psql']['db_port']
-
-    connection = create_connection(db_name, db_user, db_password, db_host, db_port)
     cursor = connection.cursor()
 
-    file_name = os.getenv('FILE_NAME')
     try:
-
 
         # Edit the query that will be loaded to the database
         query = """
@@ -85,8 +72,7 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
             cursor.execute(query, values)
             message_id = cursor.fetchone()[0]
             # In this condition, more info will be loaded to allow list table
-            for address in message['grant']['authorization']['allow_list']:
-
+            for address in message["grant"]["authorization"]["allow_list"]:
                 cursor.execute('INSERT INTO cosmos_grant_allowlist (message_id, addresses) VALUES (%s, %s); ', (message_id, address))
         # Condition 2: If not , load like this
         else:
@@ -97,16 +83,21 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
             message_info = json.dumps(message)
             values = (tx_id, tx_type, ids['granter_id'], ids['grantee_id'], authorizationtype, expiration, max_tokens, authorization_type, msg, message_info, comment  )
             cursor.execute(query, values)
+        # connection.close()
 
-        connection.commit()
-        connection.close()
     except KeyError:
-
-
-        print(f'KeyError happens in type {tx_type} in block {file_name}', file=sys.stderr)        
+        connection.rollback()
+        print(
+            f"KeyError happens in type {tx_type} in block {file_name}", file=sys.stderr
+        )
         print(traceback.format_exc(), file=sys.stderr)
     except errors.UniqueViolation as e:
-        pass
+        connection.rollback()
+    connection.commit()
+    cursor.close()
+
 
 if __name__ == '__main__':
-    main(tx_id, message_no, transaction_no, tx_type, message, ids)
+    main(
+        connection, file_name, tx_id, message_no, transaction_no, tx_type, message, ids
+    )
