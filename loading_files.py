@@ -44,6 +44,7 @@ db_port = info['psql']['db_port']
 connection = create_connection(db_name, db_user, db_password, db_host, db_port)
 
 
+
 file_path = os.getenv('FILE_PATH')
 file_name = os.getenv('FILE_NAME')
 

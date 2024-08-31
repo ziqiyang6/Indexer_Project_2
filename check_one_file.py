@@ -26,10 +26,9 @@ import sys
 import json
 from functions import check_file
 from functions import height_check
-from functions import Validate_json, checkLine
+from functions import validate_json, checkLine
 from functions import new_type
 from functions import decode_tx
-
 
 
 file_path = os.getenv('FILE_PATH')
@@ -39,7 +38,7 @@ result = check_file(file_path, file_name)
 height = height_check(result, file_name)
 
 # Check if this file passes JSON Schema test. 1 is the specific case that passes.
-if Validate_json(result, file_name) == 1:
+if validate_json(result, file_name) == 1:
 
     # Count numbers of transactions in this block
     count = len(result["block"]["data"]["txs"])
@@ -52,23 +51,23 @@ if Validate_json(result, file_name) == 1:
 else:
     foundError = checkLine(file_name, 1)
     if(foundError >= 0):
-       try:
+        try:
             with open(file_name, 'r') as fr:
                 # reading line by line
                 lines = fr.readlines()
-                
+
                 # pointer for position
                 ptr = 1
-            
+
                 # opening in writing mode
                 with open(file_name, 'w') as fw:
                     for line in lines:
-                    
+
                         # we want to remove 5th line
                         if ptr != foundError:
                             fw.write(line)
                         ptr += 1
             print("Deleted", file=sys.stderr)
-       except:
+        except:
             print("Oops! something error")
     sys.exit(8)
