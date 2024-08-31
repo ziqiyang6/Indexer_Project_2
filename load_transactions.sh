@@ -222,6 +222,6 @@ else
 fi
 
 if [[ $? -ne 0 ]]; then
-    die "Error---->The block was not successfully loaded into the database." 6
+    die "Error---->The blocks and transactions were not successfully loaded into the database." 6
 fi
 exit 0
