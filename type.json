@@ -33,6 +33,8 @@
     "/cosmwasm.wasm.v1.MsgMigrateContract": "cosmos_migrate_contract",
     "/ibc.core.client.v1.MsgCreateClient": "ibc_createclient_msg",
     "/ibc.core.connection.v1.MsgConnectionOpenTry": "ibc_openconnectiontry_msg",
-    "/ibc.core.connection.v1.MsgConnectionOpenConfirm": "ibc_openconnectionconfirm_msg"
+    "/ibc.core.connection.v1.MsgConnectionOpenConfirm": "ibc_openconnectionconfirm_msg",
+    "/cosmos.gov.v1beta1.MsgSubmitProposal": "cosmos_submitproposal_msg",
+    "/cosmos.gov.v1beta1.MsgDeposit": "cosmos_deposit_msg"
     
 }   

@@ -30,6 +30,9 @@
 --- New types 'ibc_core_channel_v1_msgchannelopenack' and
 --- 'ibc_core_channel_v1_msgchannelopeninit' have been added.             -
 --- Commission_rate is set to accept null values
+---
+---
+---
 ---------------------------------------------------------------------------
 SET client_min_messages TO WARNING;
 
@@ -1160,3 +1163,57 @@ create table if not exists ibc_createclient_msg
 
 create index if not exists ibc_createclient_msg_tx_id
     on ibc_createclient_msg(tx_id);
+
+
+
+
+create table if not exists cosmos_submitproposal_msg
+(
+    message_id         uuid default gen_random_uuid() not null
+        primary key,
+    tx_id                           uuid             not null,
+    tx_type                         VARCHAR          not null,
+    title                       VARCHAR             not null,
+    descriptions                VARCHAR             not null, 
+    proposer_id         uuid        not null,
+    message_info                    jsonb            not null,
+    comment                         VARCHAR          not null,
+    FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
+    FOREIGN KEY (proposer_id) REFERENCES address(address_id),
+    UNIQUE(tx_id, comment)
+);
+
+
+create index if not exists cosmos_submitproposal_id
+    on cosmos_submitproposal_msg (proposer_id);
+
+create index if not exists cosmos_submitproposal_tx_id
+    on cosmos_submitproposal_msg (tx_id);
+
+
+
+
+create table if not exists cosmos_deposit_msg
+(
+    message_id         uuid default gen_random_uuid() not null
+        primary key,
+    tx_id                           uuid             not null,
+    tx_type                     VARCHAR             not null,
+    proposal_id                 VARCHAR             not null, 
+    depositor_id        uuid          not null,   
+    deposit_denom               VARCHAR          not null,
+    deposit_amount              VARCHAR         not null,
+    message_info                    jsonb            not null,
+    comment                         VARCHAR          not null,
+    FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
+    FOREIGN KEY (depositor_id) REFERENCES address(address_id),
+    UNIQUE(tx_id, comment)
+);
+
+
+
+create index if not exists cosmos_deposit_id
+    on cosmos_deposit_msg (depositor_id);
+
+create index if not exists cosmos_deposit_tx_id
+    on cosmos_deposit_msg (tx_id);
