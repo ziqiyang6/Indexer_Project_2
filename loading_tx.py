@@ -149,7 +149,7 @@ for message in decoded_response['tx']['body']['messages']:
     ids = {}
     for key in message:
         # Use keywords to catch address keys
-        if 'send' in key or 'receiver' in key or 'addr' in key or 'grante' in key or 'admin' in key or 'voter' in key or 'proposer' in key or 'depositor' in key:
+        if 'send' in key or 'receiver' in key or 'addr' in key or 'grante' in key or 'admin' in key or 'voter' in key or 'proposer' in key or 'depositor' in key or 'signer' in key:
             # Define the address value and run the address_load script to load address
             address = message[key]
             ids[f'{key}_id'] = address_load.main(address)

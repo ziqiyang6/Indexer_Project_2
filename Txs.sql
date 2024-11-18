@@ -675,14 +675,17 @@ create table if not exists ibc_updateclient_msg
     tx_id                           uuid             not null,    
     tx_type                         VARCHAR          not null,
     client_id                       VARCHAR          not null,
-    client_message                  jsonb              not null,
-    signer                          VARCHAR          not null,
+    client_message                  jsonb            not null,
+    signer_id                       uuid             not null,
     message_info                    jsonb            not null,
     comment                         VARCHAR          not null,
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
+    FOREIGN KEY (signer_id) REFERENCES address(address_id),
     UNIQUE(tx_id, comment)
 );
 
+create index if not exists ibc_updateclient_msg_signer_id
+    on ibc_updateclient_msg (signer_id);
 
 create index if not exists ibc_updateclient_client_id
     on ibc_updateclient_msg (client_id);
@@ -711,15 +714,20 @@ create table if not exists ibc_timeout_msg
     proof_height_revision_number    VARCHAR          not null,
     proof_height_revision_height    VARCHAR          not null,
     next_seq_recv                   VARCHAR          not null,
-    signer                          VARCHAR          not null,
+    signer_id                       uuid             not null,
     message_info                    jsonb            not null,
     comment                         VARCHAR          not null,
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
+    FOREIGN KEY (signer_id) REFERENCES address(address_id),
     UNIQUE(tx_id, comment)
 );
 
 create index if not exists ibc_timeout_tx_id
     on ibc_timeout_msg (tx_id);
+
+create index if not exists ibc_timeout_msg_signer_id
+    on ibc_timeout_msg (signer_id);
+
 
 -- ibc_core_channel_v1_MsgRecvPacket table
 
@@ -741,15 +749,20 @@ create table if not exists ibc_recvpacket_msg
     proof_commitment                VARCHAR          not null,
     proof_height_revision_number    VARCHAR          not null,
     proof_height_revision_height    VARCHAR          not null,
-    signer                          VARCHAR          not null,
+    signer_id                          uuid          not null,
     message_info                    jsonb            not null,
     comment                         VARCHAR          not null,
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
+    FOREIGN KEY (signer_id) REFERENCES address(address_id),
     UNIQUE(tx_id, comment)
 );
 
 create index if not exists ibc_recvpacket_tx_id
     on ibc_recvpacket_msg (tx_id);
+
+create index if not exists ibc_recvpacket_msg_signer_id
+    on ibc_recvpacket_msg (signer_id);
+
 
 -- ibc_core_channel_v1_MsgAcknowledgement table
 
@@ -772,15 +785,20 @@ create table if not exists ibc_acknowledgement_msg
     proof_acked                     VARCHAR          not null,
     proof_height_revision_number    VARCHAR          not null,
     proof_height_revision_height    VARCHAR          not null,
-    signer                          VARCHAR          not null,
+    signer_id                       uuid             not null,
     message_info                    jsonb            not null,
     comment                         VARCHAR          not null,
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
+    FOREIGN KEY (signer_id) REFERENCES address(address_id),
     UNIQUE(tx_id, comment)
 );
 
 create index if not exists ibc_acknowledgement_tx_id
     on ibc_acknowledgement_msg (tx_id);
+
+create index if not exists ibc_acknowledgement_msg_signer_id
+    on ibc_acknowledgement_msg (signer_id);
+
 
 -- ibc.core.channel.v1.MsgChannelOpenConfirm table
 
@@ -795,15 +813,20 @@ create table if not exists ibc_channelopenconfirm_msg
     proof_acked                     VARCHAR          not null,
     proof_height_revision_number    VARCHAR          not null,
     proof_height_revision_height    VARCHAR          not null,
-    signer                          VARCHAR          not null,
+    signer_id                       uuid          not null,
     message_info                    jsonb            not null,
     comment                         VARCHAR          not null,
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
+    FOREIGN KEY (signer_id) REFERENCES address(address_id),
     UNIQUE(tx_id, comment)
 );
 
-create index if not exists ibc_channelopenconfirm_tx_id
+create index if not exists ibc_channelopenconfirm_msg_tx_id
     on ibc_channelopenconfirm_msg (tx_id);
+
+create index if not exists ibc_channelopenconfirm_msg_signer_id
+    on ibc_channelopenconfirm_msg (signer_id);
+
 
 -- ibc.core.channel.v1.MsgChannelOpenTry table
 
@@ -825,15 +848,20 @@ create table if not exists ibc_channelopentry_msg
     proof_init                      VARCHAR          not null,
     proof_height_revision_number    VARCHAR          not null,
     proof_height_revision_height    VARCHAR          not null,
-    signer                          VARCHAR          not null,
+    signer_id                          uuid          not null,
     message_info                    jsonb            not null,
     comment                         VARCHAR          not null,
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
+    FOREIGN KEY (signer_id) REFERENCES address(address_id),
     UNIQUE(tx_id, comment)
 );
 
 create index if not exists ibc_channelopentry_tx_id
     on ibc_channelopentry_msg (tx_id);
+
+create index if not exists ibc_channelopentry_msg_signer_id
+    on ibc_channelopentry_msg (signer_id);
+
 
 -- cosmos.staking.v1beta1.MsgEditValidator Table
 
@@ -985,7 +1013,7 @@ create index if not exists cosmos_unjail_validator_address_id
 create index if not exists cosmos_unjail_tx_id
     on cosmos_unjail_msg (tx_id);
 
-create table if not exists ibc_core_channel_v1_msgchannelopenack
+create table if not exists ibc_core_channel_v1_msgchannelopenack_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
@@ -994,16 +1022,21 @@ create table if not exists ibc_core_channel_v1_msgchannelopenack
     port_id                         VARCHAR          not null,
     channel_id                      VARCHAR          not null,
     counterparty_channel_id         VARCHAR          not null,
-    signer                          VARCHAR          not null,
+    signer_id                          uuid          not null,
     message_info                    jsonb            not null,
     comment                         VARCHAR          not null,
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
+    FOREIGN KEY (signer_id) REFERENCES address(address_id),
     UNIQUE(tx_id, comment)
 );
 create index if not exists ibc_core_channel_v1_msgchannelopenack_tx_id
     on ibc_core_channel_v1_msgchannelopenack(tx_id);
 
-create table if not exists ibc_core_channel_v1_msgchannelopeninit
+create index if not exists ibc_core_channel_v1_msgchannelopenack_msg_signer_id
+    on ibc_core_channel_v1_msgchannelopenack_msg (signer_id);
+
+
+create table if not exists ibc_core_channel_v1_msgchannelopeninit_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
@@ -1017,17 +1050,21 @@ create table if not exists ibc_core_channel_v1_msgchannelopeninit
     counterparty_channel_id         VARCHAR          not null,
     connection_hops                 VARCHAR          not null,
     version_num                     VARCHAR          not null,
-    signer                          VARCHAR          not null,
+    signer                          uuid             not null,
     message_info                    jsonb            not null,
     comment                         VARCHAR          not null,
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
+    FOREIGN KEY (signer_id) REFERENCES address(address_id),
     UNIQUE(tx_id, comment)
 );
 create index if not exists ibc_core_channel_v1_msgchannelopeninit_tx_id
     on ibc_core_channel_v1_msgchannelopeninit(tx_id);
 
+create index if not exists ibc_core_channel_v1_msgchannelopeninit_msg_signer_id
+    on ibc_core_channel_v1_msgchannelopeninit_msg (signer_id);
 
-create table if not exists cosmwasm_msg_instantiate_contract2
+
+create table if not exists cosmwasm_msg_instantiate_contract2_msg
 (
     message_id         uuid default gen_random_uuid() not null
         primary key,
@@ -1100,10 +1137,11 @@ create table if not exists ibc_openconnectiontry_msg
     proof_init                                  VARCHAR         not null,
     proof_height_revision_number    VARCHAR          not null,
     proof_height_revision_height    VARCHAR          not null,
-    signer                          VARCHAR          not null,
+    signer                          uuid            not null,
     message_info                    jsonb            not null,
     comment                         VARCHAR          not null,
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
+    FOREIGN KEY (signer_id) REFERENCES address(address_id),
     UNIQUE(tx_id, comment)
 );
 
@@ -1113,7 +1151,8 @@ create index if not exists ibc_openconnectiontry_msg_tx_id
 create index if not exists ibc_openconnectiontry_msg_proof_height
     on ibc_openconnectiontry_msg(proof_height_revision_height);
 
-
+create index if not exists iibc_openconnectiontry_msg_signer_id
+    on ibc_openconnectiontry_msg(signer_id);
 
 
 
@@ -1126,10 +1165,11 @@ create table if not exists ibc_openconnectionconfirm_msg
     connection_id                   VARCHAR          not null,
     proof_height_revision_number    VARCHAR          not null,
     proof_height_revision_height    VARCHAR          not null,
-    signer                          VARCHAR          not null,
+    signer_id                        uuid          not null,
     message_info                    jsonb            not null,
     comment                         VARCHAR          not null,
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
+    FOREIGN KEY (signer_id) REFERENCES address(address_id),
     UNIQUE(tx_id, comment)
 );
 
@@ -1138,6 +1178,11 @@ create index if not exists ibc_openconnectionconfirm_msg_tx_id
 
 create index if not exists ibc_openconnectionconfirm_msg_proof_height
     on ibc_openconnectionconfirm_msg(proof_height_revision_height);
+
+create index if not exists ibc_openconnectionconfirm_msg_signer_id
+    on ibc_openconnectionconfirm_msg(signer_id);
+
+
 
 create table if not exists ibc_createclient_msg
 (
@@ -1153,13 +1198,17 @@ create table if not exists ibc_createclient_msg
     latest_height_revision_height   VARCHAR          not null,
     frozen_height_revision_number   VARCHAR          not null,
     frozen_height_revision_height   VARCHAR          not null,
-    signer                          VARCHAR          not null,
+    signer_id                       uuid          not null,
     message_info                    jsonb            not null,
     comment                         VARCHAR          not null,
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
+    FOREIGN KEY (signer_id) REFERENCES address(address_id),
+
     UNIQUE(tx_id, comment)
 );
 
+create index if not exists ibc_createclient_msg_signer_id
+    on ibc_createclient_msg (signer_id);
 
 create index if not exists ibc_createclient_msg_tx_id
     on ibc_createclient_msg(tx_id);
@@ -1217,3 +1266,28 @@ create index if not exists cosmos_deposit_id
 
 create index if not exists cosmos_deposit_tx_id
     on cosmos_deposit_msg (tx_id);
+
+
+
+create table if not exists ibc_connectionopeninit_msg
+(
+    message_id         uuid default gen_random_uuid() not null
+        primary key,
+    tx_id                           uuid             not null,
+    tx_type                     VARCHAR             not null,
+    signer_id                 uuid             not null, 
+    message_info                    jsonb            not null,
+    comment                         VARCHAR          not null,
+    FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
+    FOREIGN KEY (signer_id) REFERENCES address(address_id),
+    UNIQUE(tx_id, comment)
+);
+
+
+
+create index if not exists ibc_connectionopeninit_msg_signer_id
+    on ibc_connectionopeninit_msg (signer_id);
+
+create index if not exists ibc_connectionopeninit_msg_tx_id
+    on ibc_connectionopeninit_msg (tx_id);
+
