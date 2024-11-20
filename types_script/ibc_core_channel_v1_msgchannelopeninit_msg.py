@@ -1,6 +1,6 @@
 '''**********************************************************************************
                                                                                     *
-Project Name: ibc_core_channel_v1_msgchannelopeninit.py                             *
+Project Name: ibc_core_channel_v1_msgchannelopeninit_msg.py                             *
                                                                                     *
 Programming Language: Python 3.11                                                   *
                                                                                     *

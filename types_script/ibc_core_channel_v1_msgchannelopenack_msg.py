@@ -1,6 +1,6 @@
 '''**********************************************************************************
                                                                                     *
-Project Name:ibc_core_channel_v1_msgchannelopenack.py                               *
+Project Name:ibc_core_channel_v1_msgchannelopenack_msg.py                               *
                                                                                     *
 Programming Language: Python 3.11                                                   *
                                                                                     *
