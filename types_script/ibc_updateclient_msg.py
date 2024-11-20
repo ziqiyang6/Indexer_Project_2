@@ -23,6 +23,9 @@ Version: 1.2                                                                    
 Comment has been updated. tx_id has been replaced to transaction order.             *
 KeyError output now can be printed into error log instead of output log             *                                                                                    *
                                                                                     *
+Version: 1.3                                                                        *
+'signer' has been replaced to 'signer_id', which is the foreign key to address table *
+                                                                                    *                                                                                                                                                                   
 **********************************************************************************'''
 
 #    Scripts start below
@@ -33,7 +36,7 @@ import os
 import traceback
 from psycopg2 import errors
 
-def main(tx_id, message_no, transaction_no, tx_type, message):
+def main(tx_id, message_no, transaction_no, tx_type, message, ids):
 
     # import the login info for psql from 'info.json'
     with open('info.json', 'r') as f:
@@ -59,10 +62,10 @@ def main(tx_id, message_no, transaction_no, tx_type, message):
 
 
         query = """
-        INSERT INTO ibc_updateclient_msg (tx_id, tx_type, client_id, client_message, signer, message_info, comment) VALUES (%s, %s, %s, %s, %s, %s, %s);
+        INSERT INTO ibc_updateclient_msg (tx_id, tx_type, client_id, client_message, signer_id, message_info, comment) VALUES (%s, %s, %s, %s, %s, %s, %s);
         """
 
-        values = (tx_id, tx_type, client_id, client_message, signer, message, comment)
+        values = (tx_id, tx_type, client_id, client_message, ids['signer_id'], message, comment)
         cursor.execute(query, values)
 
         connection.commit()

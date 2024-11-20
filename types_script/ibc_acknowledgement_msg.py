@@ -36,7 +36,7 @@ import os
 import traceback
 from psycopg2 import errors
 
-def main(tx_id, message_no, transaction_no, tx_type, message):
+def main(tx_id, message_no, transaction_no, tx_type, message, ids):
 
     # import the login info for psql from 'info.json'
     with open('info.json', 'r') as f:
@@ -54,7 +54,7 @@ def main(tx_id, message_no, transaction_no, tx_type, message):
     try:
         # Edit the query that will be loaded to the database
         query = """
-                INSERT INTO ibc_acknowledgement_msg (tx_id, tx_type, sequence_num, source_port, source_channel, destination_port, destination_channel, data_msg, timeout_height_revision_number, timeout_height_revision_height, timeout_timestamp, acknowledgement, proof_acked, proof_height_revision_number, proof_height_revision_height, signer, message_info, comment) 
+                INSERT INTO ibc_acknowledgement_msg (tx_id, tx_type, sequence_num, source_port, source_channel, destination_port, destination_channel, data_msg, timeout_height_revision_number, timeout_height_revision_height, timeout_timestamp, acknowledgement, proof_acked, proof_height_revision_number, proof_height_revision_height, signer_id, message_info, comment) 
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
                 """
 
@@ -76,7 +76,7 @@ def main(tx_id, message_no, transaction_no, tx_type, message):
         message = json.dumps(message)
         comment = f'This is number {message_no} message in number {transaction_no} transaction '
 
-        values = (tx_id, tx_type, sequence, source_port, source_channel, destination_port, destination_channel, data, timeout_height_revision_num, timeout_height_revision_height, timeout_timestamp, acknowledgement, proof_acked, proof_height_revision_number, proof_height_revision_height, signer, message, comment)
+        values = (tx_id, tx_type, sequence, source_port, source_channel, destination_port, destination_channel, data, timeout_height_revision_num, timeout_height_revision_height, timeout_timestamp, acknowledgement, proof_acked, proof_height_revision_number, proof_height_revision_height, ids['signer_id'], message, comment)
         cursor.execute(query, values)
 
         connection.commit()
@@ -90,4 +90,4 @@ def main(tx_id, message_no, transaction_no, tx_type, message):
         pass
 
 if __name__ == '__main__':
-    main(tx_id, message_no, transaction_no, tx_type, message)
+    main(tx_id, message_no, transaction_no, tx_type, message, ids)
