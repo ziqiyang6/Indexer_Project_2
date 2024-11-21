@@ -146,7 +146,7 @@ create table if not exists processed_blocks
     FOREIGN KEY (block_id) REFERENCES blocks(block_id),
     UNIQUE (block_id, height)
 
-)
+);
 
 -- unprocessed_blocks table 
 create table if not exists unprocessed_blocks
@@ -156,7 +156,7 @@ create table if not exists unprocessed_blocks
     height      VARCHAR     not null,
     comment     VARCHAR     not null,
     UNIQUE (id, height)    
-)
+);
 
 -- error_log table
 create table if not exists error_log
@@ -167,7 +167,7 @@ create table if not exists error_log
     height      VARCHAR     not null,
     json_info   jsonb       not null,
     comment     VARCHAR     not null
-)
+);
 
 
 
