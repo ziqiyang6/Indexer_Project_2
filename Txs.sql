@@ -136,6 +136,40 @@ create table if not exists type
 );
 
 
+-- processed_blocks table
+create table if not exists processed_blocks
+(
+    block_id        uuid        not null,
+    height          VARCHAR     not null,
+    loading_time    timestamp   not null,  
+    comment         VARCHAR     not null, 
+    FOREIGN KEY (block_id) REFERENCES blocks(block_id),
+    UNIQUE (block_id, height)
+
+)
+
+-- unprocessed_blocks table 
+create table if not exists unprocessed_blocks
+(
+    id          uuid default gen_random_uuid() not null
+        primary key,
+    height      VARCHAR     not null,
+    comment     VARCHAR     not null,
+    UNIQUE (id, height)    
+)
+
+-- error_log table
+create table if not exists error_log
+(
+    id          uuid default gen_random_uuid() not null
+        primary key,
+    error_msg   VARCHAR     not null,
+    height      VARCHAR     not null,
+    json_info   jsonb       not null,
+    comment     VARCHAR     not null
+)
+
+
 
 -- alliance_alliance_MsgClaimDelegationRewards table
 
