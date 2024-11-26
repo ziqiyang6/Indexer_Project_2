@@ -179,6 +179,7 @@ for message in decoded_response['tx']['body']['messages']:
     except KeyError:
         print(f'KeyError happened in block {file_name}', file=sys.stderr)
         print(traceback.format_exc(), file=sys.stderr)
+
     except AttributeError:
         print(f'Script {table_type} does not have a main function, error caused in block {file_name}', file=sys.stderr)
     except ImportError:

@@ -30,7 +30,7 @@
         "/ibc.core.channel.v1.MsgChannelOpenInit" : "ibc_core_channel_v1_msgchannelopeninit_msg",
         "/ibc.core.channel.v1.MsgChannelOpenAck": "ibc_core_channel_v1_msgchannelopenack_msg",
         "/cosmwasm.wasm.v1.MsgInstantiateContract2": "cosmwasm_msg_instantiate_contract2",
-    "/cosmwasm.wasm.v1.MsgMigrateContract": "cosmos_migrate_contract",
+    "/cosmwasm.wasm.v1.MsgMigrateContract": "cosmwasm_migratecontract_msg",
     "/ibc.core.client.v1.MsgCreateClient": "ibc_createclient_msg",
     "/ibc.core.connection.v1.MsgConnectionOpenTry": "ibc_openconnectiontry_msg",
     "/ibc.core.connection.v1.MsgConnectionOpenConfirm": "ibc_openconnectionconfirm_msg",
