@@ -63,7 +63,7 @@ cursor = connection.cursor()
 # Set the path of file
 file_path = os.getenv('FILE_PATH')
 file_name = os.getenv('FILE_NAME')
-output_path = os.getenv('txt')
+#output_path = os.getenv('txt')
 cwd = os.getcwd()
 
 # Set the values that will be loaded to database
@@ -143,7 +143,7 @@ for message in decoded_response['tx']['body']['messages']:
         
         print(f"Error with loading block info in block " + file_name, file=sys.stderr)
         print(traceback.format_exc(), file=sys.stderr)
-        new_type(str(message), output_path, height, order , i)
+        #new_type(str(message), output_path, height, order , i)
         continue
 
     ids = {}

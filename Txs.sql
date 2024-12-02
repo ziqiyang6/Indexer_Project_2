@@ -155,7 +155,7 @@ create table if not exists unprocessed_blocks
         primary key,
     height      VARCHAR     not null,
     comment     VARCHAR     not null,
-    UNIQUE (id, height)    
+    UNIQUE ( height)    
 );
 
 -- error_log table
@@ -166,7 +166,8 @@ create table if not exists error_log
     error_msg   VARCHAR     not null,
     height      VARCHAR     not null,
     json_info   jsonb       not null,
-    comment     VARCHAR     not null
+    comment     VARCHAR     not null,
+    UNIQUE(error_msg, height)
 );
 
 
